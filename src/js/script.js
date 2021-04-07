@@ -53,4 +53,19 @@ async function getHtml(element) {
 window.onload = async () => {
     await getHtml('header')
     await getHtml('footer')
+    // var rawFile = new XMLHttpRequest();
+    // rawFile.open("GET", 'src/html/header.html', false);
+    // rawFile.onreadystatechange = function ()
+    // {
+    //     if(rawFile.readyState === 4)
+    //     {
+    //         if(rawFile.status === 200 || rawFile.status == 0)
+    //         {
+    //             var allText = rawFile.responseText;
+    //             document.getElementsByTagName('header')[0].innerHTML = allText
+    //             btIndex.classList.add('active')
+    //         }
+    //     }
+    // }
+    // rawFile.send(null);
 }
