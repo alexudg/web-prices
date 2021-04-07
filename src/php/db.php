@@ -101,7 +101,7 @@ function generateToken($id) {
 }
 
 function isNamePass($name, $pass) {
-    $echo = array('result' => false, 'data' => null);
+    $echo = array('result' => false, 'user' => null);
     $sql = 'SELECT id FROM users WHERE username = ?';
     $params = array($name);
     $result = Database::executeSql($sql, $params); // ()|(('id' => <int>))
@@ -118,12 +118,12 @@ function isNamePass($name, $pass) {
             $sql = 'SELECT token FROM users WHERE id = ?';
             $params = array($id);
             $result = Database::executeSql($sql, $params); // (('token' => ''|<8-digits>))
-            $echo['data']['id'] = $id;
+            $echo['user']['id'] = $id;
             if (strlen($result[0]['token']) == 8) 
-                $echo['data']['token'] = $result[0]['token'];
+                $echo['user']['token'] = $result[0]['token'];
             // generate token
             else 
-                $echo['data']['token'] = generateToken($id);
+                $echo['user']['token'] = generateToken($id);
         }
     }
     exit(json_encode($echo));
