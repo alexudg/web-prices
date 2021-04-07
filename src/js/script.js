@@ -13,6 +13,7 @@ async function executeGet(url, isText=false) {
     })
     return echo
 }
+
 async function executePost(url, data, isText=false) {
     let echo = isText ? '' : []
     await fetch(url, {
@@ -39,7 +40,7 @@ async function getHtml(element) {
     document.getElementsByTagName(element)[0].innerHTML = html
     //console.log(window.location.pathname.split('/').reverse()[0])
     switch (window.location.pathname.split('/').reverse()[0]) {
-        case 'index.html':
+        case '': case 'index.html':
             btIndex.classList.add('active')
             break;
 
@@ -49,7 +50,7 @@ async function getHtml(element) {
     }
 }
 
-window.onload = () => {
-    getHtml('header')
-    getHtml('footer')
+window.onload = async () => {
+    await getHtml('header')
+    await getHtml('footer')
 }
