@@ -1,7 +1,12 @@
 <?php
 
     if (!empty($_GET) and isset($_GET['fn'])) {
-        exit(json_encode($_GET));
+        //exit(json_encode($_GET));
+        switch ($_GET['fn']) {
+            case 'getUserId':
+                getUserId($_GET['token']);
+                break;
+        }
     }
     else if (!empty($_POST) and isset($_POST['fn'])) {
         switch ($_POST['fn']) {
@@ -122,6 +127,16 @@ function isNamePass($name, $pass) {
         }
     }
     exit(json_encode($echo));
+}
+
+function getUserId($token) {
+    $sql = 'SELECT id FROM users WHERE token = ?';
+    $params = array($token);
+    $result = Database::executeSql($sql, $params);
+    $id = null;
+    if (count($result) > 0)
+        $id = $result[0]['id'];
+    die(json_encode(array('id' => $id)));
 }
 
 ?>

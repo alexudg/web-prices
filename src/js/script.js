@@ -33,39 +33,16 @@ async function executePost(url, data, isText=false) {
     return echo
 }
 
-async function getHtml(element) {
-    const path = 'src/html/' + element + '.html'
-    const html = await executeGet(path, true)
-    //console.log(html)
-    document.getElementsByTagName(element)[0].innerHTML = html
-    //console.log(window.location.pathname.split('/').reverse()[0])
-    switch (window.location.pathname.split('/').reverse()[0]) {
-        case '': case 'index.html':
-            btIndex.classList.add('active')
-            break;
+let html = `<img src="src/img/logo300x243px.png" alt="">
+            <nav>
+                <a href="index.html" id="btIndex">Inicio</a>
+                <a href="input.html" id="btInput">Ingresar</a>`
+var id = sessionStorage.getItem('id')
+if (id)
+    html +=    '<a href="exit.html" id="btExit">Salir</a>'            
+html +=    `</nav>`            
 
-        case 'input.html':
-            btInput.classList.add('active')
-            break;
-    }
-}
+document.getElementsByTagName('header')[0].innerHTML = html
 
-window.onload = async () => {
-    await getHtml('header')
-    await getHtml('footer')
-    // var rawFile = new XMLHttpRequest();
-    // rawFile.open("GET", 'src/html/header.html', false);
-    // rawFile.onreadystatechange = function ()
-    // {
-    //     if(rawFile.readyState === 4)
-    //     {
-    //         if(rawFile.status === 200 || rawFile.status == 0)
-    //         {
-    //             var allText = rawFile.responseText;
-    //             document.getElementsByTagName('header')[0].innerHTML = allText
-    //             btIndex.classList.add('active')
-    //         }
-    //     }
-    // }
-    // rawFile.send(null);
-}
+document.getElementsByTagName('footer')[0].innerHTML =
+    `<p>footer.html</p>`

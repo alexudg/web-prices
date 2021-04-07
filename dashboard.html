@@ -11,13 +11,19 @@
 <body>
     <header></header>
     <main>
-        <p>index.html</p>
+        <p>dashboard.html</p>
     </main>
     <footer></footer>
     <script src="src/js/script.js"></script>
     <script>
         window.onload = () => {
-            btIndex.classList.add('active')
+            var token = localStorage.getItem('token')
+            var id = sessionStorage.getItem('id')
+            console.log('token:', token)
+            console.log('id: ', id) 
+            if (id == null) {
+                window.location.href = 'input.html'
+            }    
         }               
     </script>
 </body>
