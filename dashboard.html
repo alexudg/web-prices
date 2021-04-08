@@ -17,13 +17,12 @@
     <script src="src/js/script.js"></script>
     <script>
         window.onload = () => {
-            var token = localStorage.getItem('token')
-            var id = sessionStorage.getItem('id')
-            console.log('token:', token)
-            console.log('id: ', id) 
-            if (id == null) {
+            console.log('localStorage.token:', localStorage.token)
+            console.log('sessionStorage.id: ', sessionStorage.id) 
+            if (!sessionStorage.id) {
                 window.location.href = 'input.html'
-            }    
+            }
+            btDashboard.classList.add('active')
         }               
     </script>
 </body>

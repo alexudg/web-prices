@@ -30,6 +30,7 @@
 
 .form__status {
     background-color: salmon;
+    margin: 10px 0;
     padding: 5px;
     border-radius: 5px;
     box-shadow: 0 0 3px black;
