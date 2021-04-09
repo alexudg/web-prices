@@ -5,25 +5,42 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="src/css/style.css">
+    <link rel="stylesheet" href="src/css/table.css">
     <link rel="shortcut icon" href="src/img/favicon32px.png" type="image/png">
     <title>Checador de precios</title>
 </head>
 <body>
     <header></header>
     <main>
-        <p>dashboard.html</p>
+        <table>            
+            <caption>Articulos</caption>
+            <thead>
+                <tr>
+                    <td>
+                        <input type="search" id="searchArticle" placeholder="buscar..." onchange="loadArticles()" on>
+                        <button onclick="addArticle()">Agregar</button>
+                    </td>
+                </tr>
+                <tr>
+                    <th>Código</th>
+                    <th>Artículo</th>
+                    <th>Precio</th>
+                    <th>Familia</th>
+                </tr>
+            </thead>
+            <tbody id="tbody">
+                <!-- articles -->
+            </tbody>
+            <tfoot> 
+                <tr>
+                    <td></td>
+                    <td id="countArticles"></td>
+                </tr>
+            </tfoot>    
+        </table>
     </main>
     <footer></footer>
     <script src="src/js/script.js"></script>
-    <script>
-        window.onload = () => {
-            console.log('localStorage.token:', localStorage.token)
-            console.log('sessionStorage.id: ', sessionStorage.id) 
-            if (!sessionStorage.id) {
-                window.location.href = 'input.html'
-            }
-            btDashboard.classList.add('active')
-        }               
-    </script>
+    <script src="src/js/dashboard.js"></script>
 </body>
 </html>

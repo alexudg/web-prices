@@ -6,7 +6,14 @@
             case 'getUserId':
                 getUserId($_GET['token']);
                 break;
+            case 'getArticles':
+                getArticles($_GET['txt']);
+                break;
+            case 'getArticle':
+                getArticle($_GET['id']);
+                break;
         }
+        exit();
     }
     else if (!empty($_POST) and isset($_POST['fn'])) {
         switch ($_POST['fn']) {
@@ -14,7 +21,7 @@
                 isNamePass($_POST['username'], $_POST['pass']);
                 break;
         }
-        //exit(json_encode($_POST));
+        exit();
     }
 
 class Database {
@@ -137,6 +144,34 @@ function getUserId($token) {
     if (count($result) > 0)
         $id = $result[0]['id'];
     die(json_encode(array('id' => $id)));
+}
+
+function getArticles($txt) {
+    $articles = json_decode(file_get_contents('../json/articles.json'));
+    # orden ascendente
+    usort($articles, function ($a, $b) {
+        return $a->description > $b->description;
+    });
+
+    if (strlen($txt) > 0) {
+        $result = array();
+        foreach($articles as $key => $value) {
+            if (gettype(strpos($value->description, $txt)) == 'integer') #objeto no array
+                array_push($result, $value);            
+        }
+    }
+    else
+        $result = $articles;
+    exit(json_encode($result));
+}
+
+function getArticle($id) {
+    $articles = json_decode(file_get_contents('../json/articles.json'));
+    $key = array_search($id, array_column($articles, 'id'));
+    $result = array();
+    if (gettype($key) == 'integer')
+        $result = $articles[$key];
+    exit(json_encode($result));
 }
 
 ?>
