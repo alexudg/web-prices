@@ -20,12 +20,45 @@
     border-radius: 5px;
 }
 
-.form__form > input[type=submit] {
+.form__form input[type=submit] {
     background-color: blue;
     color: white;
     height: 35px;
     font-size: 12pt;
+    /* margin-top: 10px; */
+}
+
+/* submit sin boton 'cancelar' al costado */
+.form__form > input[type=submit] {
     margin-top: 10px;
+}
+
+.form__form input[type=submit]:hover {
+    cursor: pointer;
+}
+
+/* width 100% */
+.form__buttons {
+    /* background-color: silver; */
+    margin-top: 10px;
+    display: flex;
+    justify-content: space-between;  
+    align-items: center;  
+}
+
+.form__buttons > [type=submit],
+.form__buttons > [type=button] {
+    width: 45%;
+    border: none;
+    border-radius: 5px;    
+}
+
+.form__form input[type=button] {
+    height: 35px;     
+}
+
+.form__form input[type=button]:hover {
+    cursor: pointer;
 }
 
 .form__status {

@@ -3,30 +3,33 @@
         "id": 1,
         "code": "1111",
         "description": "jabon zote 400g",
-        "price": 19.50,
-        "family": "abarrotes"        
+        "price": 19.5,
+        "family": "abarrotes"
     },
     {
         "id": 2,
         "code": "2222",
         "description": "salvo liquido 200ml",
-        "price": 23.00,
+        "price": 23,
         "family": "abarrotes"
     },
     {
         "id": 3,
         "code": "3333",
         "description": "harina para hotcakes 300g",
-        "price": 32.00,
+        "price": 32,
         "family": "abarrotes"
     },
     {
         "id": 4,
-        "code": "4444",
-        "description": "alka seltzer 2pzs",
-        "price": 5.00,
-        "family": "abarrotes"
+        "code": "5",
+        "description": "cinco",
+        "price": 5.5
+    },
+    {
+        "id": 5,
+        "code": "6",
+        "description": "seis",
+        "price": 6.6
     }
 ]
-
-

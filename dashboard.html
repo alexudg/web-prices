@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="src/css/style.css">
     <link rel="stylesheet" href="src/css/table.css">
+    <link rel="stylesheet" href="src/css/modal.css">
     <link rel="shortcut icon" href="src/img/favicon32px.png" type="image/png">
     <title>Checador de precios</title>
 </head>
@@ -16,7 +17,7 @@
             <caption>Articulos</caption>
             <thead>
                 <tr>
-                    <td>
+                    <td colspan="2">
                         <input type="search" id="searchArticle" placeholder="buscar..." onchange="loadArticles()" on>
                         <button onclick="addArticle()">Agregar</button>
                     </td>
@@ -33,14 +34,34 @@
             </tbody>
             <tfoot> 
                 <tr>
-                    <td></td>
-                    <td id="countArticles"></td>
+                    <td colspan="5" id="countArticles"></td>
                 </tr>
             </tfoot>    
         </table>
+        <section class="modal" id="modal">
+            <div class="form">
+                <h4 id="formTitle">Agregar producto</h4>
+                <form class="form__form" id="form">
+                    <input type="number" name="id"> <!-- 0=insert, >0 update -->
+                    <input type="text" name="code" placeholder="Código">
+                    <input type="text" name="description" placeholder="*Descripción" required>
+                    <input type="number" name="price" step="0.1" placeholder="*Precio" required>
+                    <h5>*Campos obligatorios</h5>
+                    <div class="form__buttons">
+                        <input type="submit" value="Guardar">
+                        <input type="button" value="Cancelar" id="btCancel">
+                    </div>
+                </form>
+                <div class="form__status" id="statusArea">
+                    <span class="form__status-close" id="btCloseStatus">x</span>
+                    <p class="modal__status-text" id="statusText">Lorem ipsum dolor sit amet consectetur adipisicing elit. Ad et recusandae, illo itaque repudiandae quo vel quis eius iste. Sunt provident asperiores saepe, vero suscipit distinctio impedit fuga mollitia itaque!</p>
+                </div>
+            </div>
+        </section>
     </main>
     <footer></footer>
     <script src="src/js/script.js"></script>
+    <script src="src/js/form.js"></script>
     <script src="src/js/dashboard.js"></script>
 </body>
 </html>

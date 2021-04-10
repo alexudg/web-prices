@@ -9,6 +9,12 @@
             case 'getArticles':
                 getArticles($_GET['txt']);
                 break;
+            case 'isCodeExists':
+                isCodeExists($_GET['code'], $_GET['id']);
+                break;
+            case 'isDescriptionExists':
+                isDescriptionExists($_GET['description'], $_GET['id']);
+                break;
             case 'getArticle':
                 getArticle($_GET['id']);
                 break;
@@ -19,6 +25,10 @@
         switch ($_POST['fn']) {
             case 'isNamePass':
                 isNamePass($_POST['username'], $_POST['pass']);
+                break;
+            case 'addUpdateArticle':
+                unset($_POST['fn']);
+                addUpdateArticle($_POST);
                 break;
         }
         exit();
@@ -146,6 +156,67 @@ function getUserId($token) {
     die(json_encode(array('id' => $id)));
 }
 
+function isCodeExists($code, $id) {
+    $result = array('success' => false, 'description' => null);
+    $articles = json_decode(file_get_contents('../json/articles.json')); # array of objects, inicia con key=0
+    $key = array_search($code, array_column($articles, 'code')); # id<int> | false
+    
+    # si encontro el objeto con el mismo codigo
+    if (gettype($key) == 'integer') { # 0=false usar gettype
+        $article = $articles[$key]; # tomar el objeto del articulo que tiene el mismo codigo
+        # verificar si el id es diferente, entonces el codigo es de otro articulo
+        if ($article->id != $id)  {
+            $result['success'] = true;
+            $result['description'] = $article->description;        
+        }        
+    }
+    exit(json_encode($result));
+}
+
+function isDescriptionExists($description, $id) {
+    $result = array('success' => false);
+    $articles = json_decode(file_get_contents('../json/articles.json')); # array of objects, inicia con key=0
+    foreach($articles as $key=>$value) {
+        if (strtoupper($description) == strtoupper($value->description)) {
+            if ($id != $value->id) 
+                $result['success'] = true;
+            break;
+        }
+    }    
+    exit(json_encode($result));
+}
+
+function addUpdateArticle($article) {
+    $article['price'] = floatval($article['price']); # string to float    
+    $articles = json_decode(file_get_contents('../json/articles.json'));
+
+    # nuevo id para agregar articulo
+    if ($article['id'] == 0) {
+        $articleMax = end($articles);
+        //print_r($articleMax);
+        $article['id'] = $articleMax->id + 1;
+        array_push($articles, $article); # agregar nuevo articulo
+        //print_r($articles);
+    }
+    # obtener objeto con el mismo id
+    else {
+        $article['id'] = intval($article['id']); # str to int
+        foreach($articles as $value) {
+            # objeto encontrado
+            if ($article['id'] == $value->id) {
+                //$value = $article;
+                $value->code = $article['code'];
+                $value->description = $article['description'];
+                $value->price = $article['price'];
+                break;
+            }
+        }
+    }
+    
+    file_put_contents('../json/articles.json', json_encode($articles, JSON_PRETTY_PRINT));
+    exit(json_encode(array('success' => true)));    
+}
+
 function getArticles($txt) {
     $articles = json_decode(file_get_contents('../json/articles.json'));
     # orden ascendente
@@ -156,7 +227,7 @@ function getArticles($txt) {
     if (strlen($txt) > 0) {
         $result = array();
         foreach($articles as $key => $value) {
-            if (gettype(strpos($value->description, $txt)) == 'integer') #objeto no array
+            if (gettype(strpos($value->code, $txt)) == 'integer' or gettype(strpos($value->description, $txt)) == 'integer') #objeto no array
                 array_push($result, $value);            
         }
     }

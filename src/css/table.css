@@ -1,6 +1,29 @@
 table {
     border: 0.5px solid gray;
     border-collapse: separate;
+    font-size: 14pt;
+}
+
+table > thead input[type=search] {
+    height: 35px;
+    border: 0.5 solid silver;
+    border-radius: 5px;   
+}
+
+table > thead button {
+    background-color: lightgreen;    
+}
+
+table button {    
+    width: 100px;
+    height: 35px;
+    font-size: 12pt;
+    border: none;
+    border-radius: 5px;
+}
+
+table button:hover {
+    cursor: pointer;
 }
 
 .price {
@@ -9,4 +32,24 @@ table {
 
 td {
     padding: 0 3px;
+}
+
+.bt-edit {
+    background-color: dodgerblue;
+}
+
+.bt-del {
+    background-color: salmon;
+}
+
+table > tfoot > tr {
+    margin-top: 10px;
+}
+
+table > tfoot td {
+    background-color: gainsboro;
+    text-align: center;
+    padding: 5px 0;
+    border-radius: 3px;
+    box-shadow: 0 0 3px black;
 }
