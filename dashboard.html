@@ -19,7 +19,7 @@
                 <tr>
                     <td colspan="2">
                         <input type="search" id="searchArticle" placeholder="buscar..." onchange="loadArticles()" on>
-                        <button onclick="addArticle()">Agregar</button>
+                        <button onclick="addArticle()">Agregar</button>                        
                     </td>
                 </tr>
                 <tr>
@@ -42,10 +42,15 @@
             <div class="form">
                 <h4 id="formTitle">Agregar artículo</h4>
                 <form class="form__form" id="form">
-                    <input type="number" name="id"> <!-- 0=insert, >0 update -->
+                    <input type="hidden" name="id"> <!-- 0=insert, >0 update -->
                     <input type="text" name="code" placeholder="Código">
                     <input type="text" name="description" placeholder="*Descripción" required>
                     <input type="number" name="price" step="0.1" placeholder="*Precio" required>
+                    <label for="selFamilies">Familia</label>
+                    <select name="family">
+                        <!-- combo con las familias -->
+                    </select>
+                    <button>Familias</button>
                     <h5>*Campos obligatorios</h5>
                     <div class="form__buttons">
                         <input type="submit" value="Guardar">
