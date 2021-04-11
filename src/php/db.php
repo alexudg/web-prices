@@ -1,159 +1,88 @@
 <?php
 
-    if (!empty($_GET) and isset($_GET['fn'])) {
-        //exit(json_encode($_GET));
-        switch ($_GET['fn']) {
-            case 'getUserId':
-                getUserId($_GET['token']);
-                break;
-            case 'getArticles':
-                getArticles($_GET['txt']);
-                break;
-            case 'isCodeExists':
-                isCodeExists($_GET['code'], $_GET['id']);
-                break;
-            case 'isDescriptionExists':
-                isDescriptionExists($_GET['description'], $_GET['id']);
-                break;
-            case 'getArticle':
-                getArticle($_GET['id']);
-                break;
-        }
-        exit();
+if (!empty($_GET) and isset($_GET['fn'])) {
+    //exit(json_encode($_GET));
+    switch ($_GET['fn']) {
+        case 'getUserData':
+            getUserData($_GET['token']);
+            break;
+        case 'getArticles':
+            getArticles($_GET['txt']);
+            break;
+        case 'isCodeExists':
+            isCodeExists($_GET['code'], $_GET['id']);
+            break;
+        case 'isDescriptionExists':
+            isDescriptionExists($_GET['description'], $_GET['id']);
+            break;
+        case 'getArticle':
+            getArticle($_GET['id']);
+            break;
     }
-    else if (!empty($_POST) and isset($_POST['fn'])) {
-        switch ($_POST['fn']) {
-            case 'isNamePass':
-                isNamePass($_POST['username'], $_POST['pass']);
-                break;
-            case 'addUpdateArticle':
-                unset($_POST['fn']);
-                addUpdateArticle($_POST);
-                break;
-        }
-        exit();
+    exit();
+}
+else if (!empty($_POST) and isset($_POST['fn'])) {
+    switch ($_POST['fn']) {
+        case 'isUserExists':
+            isUserExists($_POST['username'], $_POST['pass']);
+            break;
+        case 'addUpdateArticle':
+            unset($_POST['fn']);
+            addUpdateArticle($_POST);
+            break;
+        case 'delArticle':
+            delArticle($_POST['id']);
+            break;
     }
-
-class Database {
-    ### MySQL
-    private const DRIVER   = 'mysql';
-    private const PORT     = '3306';
-
-    // localhost
-    private const HOST     = '127.0.0.1'; 
-    private const DBNAME   = 'db_prices';  
-    private const USERNAME = 'root';
-    private const PASSWD   = '';
-    //*/
-
-    private const CHARSET  = 'utf8';
-    private const DSN      = self::DRIVER.':host='.self::HOST.';port='.self::PORT.';dbname='.self::DBNAME.';charset='.self::CHARSET;    
-    private const OPTIONS  = array(
-                        PDO::ATTR_TIMEOUT => 5, // in seconds
-                        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                        PDO::ATTR_EMULATE_PREPARES => false, // evita que todo se trate como string 
-                        //PDO::ATTR_STRINGIFY_FETCHES => false // no consulta string (no funciona)
-                     );        
-    
-    public static function getConnection() {
-        try {
-            return new PDO(self::DSN, self::USERNAME, self::PASSWD, self::OPTIONS);                
-        } catch (PDOException $e) {
-            die('ERROR CON BASE DE DATOS: ' . $e->getMessage()); //utf8_encode($e->getMessage()));
-        }
-    }
-
-    public static function executeSql($sql, $params = array()) {
-        // echo '<br>params: ';
-        // var_dump($params);
-        $con = self::getConnection();
-        $res = array();
-        try {
-            //echo '<br>$sql='.$sql;
-            $sta = $con->prepare($sql); // consulta sin parametros $con->query()
-            // foreach ($params as $key => $value) {
-            //     $key++;
-            //     echo '<br>$key='.$key.' $value='.$value;
-            //     $sta->bindParam($key, $value); // (indice inicia en 1, value)
-            // } 
-            $sta->execute($params);
-
-            $res = $sta->fetchAll(PDO::FETCH_ASSOC); // solo nombres de campos
-
-            // foreach($con->query($sql, PDO::FETCH_ASSOC) as $row) {
-            //     var_dump($row);
-            // }
-        } catch (PDOException $e) {
-            die('ERROR CON LA BASE DE DATOS: ' . $e->getMessage());
-        }        
-        $con = null;
-        // echo '<br>var_dump($res): ';
-        // var_dump($res);
-        // echo '<br>print_r($res): ';
-        // print_r($res);
-        return $res;
-    }
-
-    public static function getLastInsertId($table) {
-        $sql = 'SELECT MAX(id) id FROM '.$table;
-        $result = self::executeSql($sql); // (('id' => <int>))
-        return $result[0]['id'];
-    }
+    exit();
 }
 
-// testDb();
-// function testDb() {
-//     die(json_encode(Database::executeSql('SELECT * FROM users')));
-// }
-
-function generateToken($id) {
-    $token = '';
-    for ($i=0; $i < 8; $i++)
-        $token .= dechex(rand(0, 15));
-    // save
-    $sql = 'UPDATE users SET token = ? WHERE id = ?';
-    $params = array($token, $id);
-    Database::executeSql($sql, $params);
-    return $token;
+function isUserExists($username, $pass) {
+    $result = array('success' => false, 'user' => null);
+    $usersPath = '../json/users.json';
+    if (file_exists($usersPath)) {
+        $users = json_decode(file_get_contents($usersPath));
+        $users_username = array_column($users, 'username'); # array de todos los username
+        $key = array_search($username, $users_username); # <int>|false
+        
+        # key=false puede pasar x cero, comparacion estricta
+        if ($key === 0 or $key > 0) { 
+            # obtener contraseña encriptada
+            $hash = $users[$key]->pass;
+            # verificar contraseña
+            if (password_verify($pass, $hash)) {
+                # generar token
+                $token = '';
+                for ($i=0; $i < 8; $i++)
+                    $token .= dechex(rand(0, 15));
+                $users[$key]->token = $token;    
+                $result['success'] = true;
+                $result['user']['id'] = $users[$key]->id;
+                $result['user']['username'] = $users[$key]->username;
+                $result['user']['token'] = $token;
+                file_put_contents($usersPath, json_encode($users, JSON_PRETTY_PRINT));
+            }
+        }    
+    }
+    exit(json_encode($result));
 }
 
-function isNamePass($name, $pass) {
-    $echo = array('result' => false, 'user' => null);
-    $sql = 'SELECT id FROM users WHERE username = ?';
-    $params = array($name);
-    $result = Database::executeSql($sql, $params); // ()|(('id' => <int>))
-    if (count($result) > 0) {
-        // verify pass
-        $id = $result[0]['id'];
-        $sql = 'SELECT pass FROM users WHERE id = ?';
-        $params = array($id);
-        $result = Database::executeSql($sql, $params); 
-        // pass ok?
-        if (password_verify($pass, $result[0]['pass'])) { 
-            $echo['result'] = true;
-            // get token o generate
-            $sql = 'SELECT token FROM users WHERE id = ?';
-            $params = array($id);
-            $result = Database::executeSql($sql, $params); // (('token' => ''|<8-digits>))
-            $echo['user']['id'] = $id;
-            if (strlen($result[0]['token']) == 8) 
-                $echo['user']['token'] = $result[0]['token'];
-            // generate token
-            else 
-                $echo['user']['token'] = generateToken($id);
+function getUserData($token) {
+    $result = array('success' => false, 'user' => null);
+    $usersPath = '../json/users.json';
+    if (file_exists($usersPath)) {
+        $users = json_decode(file_get_contents($usersPath));
+        $users_token = array_column($users, 'token'); # array de todos los username
+        $key = array_search($token, $users_token); # <int>|false
+        
+        # key=false puede pasar x cero, comparacion estricta
+        if ($key === 0 or $key > 0) { 
+            $result['success'] = true;
+            $result['user']['id'] = $users[$key]->id;
+            $result['user']['username'] = $users[$key]->username;
         }
     }
-    exit(json_encode($echo));
-}
-
-function getUserId($token) {
-    $sql = 'SELECT id FROM users WHERE token = ?';
-    $params = array($token);
-    $result = Database::executeSql($sql, $params);
-    $id = null;
-    if (count($result) > 0)
-        $id = $result[0]['id'];
-    die(json_encode(array('id' => $id)));
+    exit(json_encode($result));    
 }
 
 function isCodeExists($code, $id) {
@@ -192,9 +121,10 @@ function addUpdateArticle($article) {
 
     # nuevo id para agregar articulo
     if ($article['id'] == 0) {
-        $articleMax = end($articles);
-        //print_r($articleMax);
-        $article['id'] = $articleMax->id + 1;
+        if (count($articles) > 0)
+            $article['id'] = end($articles)->id + 1; # ultimo elemento sera id mayor
+        else
+            $article['id'] = 1;
         array_push($articles, $article); # agregar nuevo articulo
         //print_r($articles);
     }
@@ -211,8 +141,7 @@ function addUpdateArticle($article) {
                 break;
             }
         }
-    }
-    
+    }    
     file_put_contents('../json/articles.json', json_encode($articles, JSON_PRETTY_PRINT));
     exit(json_encode(array('success' => true)));    
 }
@@ -242,6 +171,23 @@ function getArticle($id) {
     $result = array();
     if (gettype($key) == 'integer')
         $result = $articles[$key];
+    exit(json_encode($result));
+}
+
+function delArticle($id) {
+    $result = array('success' => false);
+    $articlesPath = '../json/articles.json';
+    if (file_exists($articlesPath)) {
+        $articles = json_decode(file_get_contents($articlesPath));
+        $ids = array_column($articles, 'id'); # array de id's 
+        $key = array_search($id, $ids);
+        # estrictamente igual a cero, ya que false es cero tambien
+        if ($key === 0 or $key > 0) { 
+            unset($articles[$key]);
+            file_put_contents($articlesPath, json_encode($articles, JSON_PRETTY_PRINT));
+            $result['success'] = true;
+        }
+    } 
     exit(json_encode($result));
 }
 

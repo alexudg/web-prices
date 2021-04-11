@@ -18,8 +18,11 @@ async function editArticle(id) {
     form.code.focus()
 }
 
-function delArticle(id) {
-    console.log('del-' + id)
+function delArticle(id, description) {
+    //console.log(id, description)
+    idToDel.value = id
+    descriptionToDel.innerText = description + '?'
+    modalDel.style.display = 'flex'
 }
 
 async function loadArticles() {
@@ -38,19 +41,39 @@ async function loadArticles() {
                                 <td>${element.family}</td>
                                 <td>
                                     <button class="bt-edit" onclick="editArticle(${element.id})">Modificar</button>
-                                    <button class="bt-del" onclick="delArticle(${element.id})">Eliminar</button>
+                                    <button class="bt-del" onclick="delArticle(${element.id}, '${element.description}')">Eliminar</button>
                                 </td>
                             </tr>`
     });
     countArticles.innerHTML = articles.length + ' artículo'
     if (articles.length !== 1)
         countArticles.innerHTML += 's'
-    countArticles.innerHTML += ' encontrados con el texto <b>' + searchArticle.value.trim() + '</b>'
+    countArticles.innerHTML += ' encontrado'
+    if (articles.length !== 1)
+        countArticles.innerHTML += 's' 
+    countArticles.innerHTML += ' con el texto <b>' + searchArticle.value.trim() + '</b>'
     searchArticle.value = ''
 }
 
 btCancel.onclick = () => {
     modal.click() // emula click y param eve sera de el mismo
+}
+
+btOkDel.onclick = async () => {
+    //console.log('btOkDel')
+    formData = new FormData
+    formData.append('fn', 'delArticle')
+    formData.append('id', idToDel.value)
+    const response = await executePost('src/php/db.php', formData) // script.js
+    console.log(response)
+    if (response.success) {
+        modalDel.click() // se genera el param 'eve'        
+    } 
+}
+
+btCancelDel.onclick = () => {
+    //console.log('btCancelDel')
+    modalDel.click()
 }
 
 modal.onclick = (eve) => {
@@ -62,9 +85,23 @@ modal.onclick = (eve) => {
     }
 }
 
+modalDel.onclick = (eve) => {
+    if (eve.target == modalDel) {
+        modalDel.style.display = 'none'
+        // limpiar form
+        statusDelArea.style.display = 'none'
+    }
+}
+
+
 btCloseStatus.onclick = () => {
     //console.log('closeStatus')
     statusArea.style.display = 'none'
+}
+
+btCloseStatusDel.onclick = () => {
+    //console.log('closeStatus')
+    statusDelArea.style.display = 'none'
 }
 
 form.onsubmit = async (eve) => {
@@ -117,6 +154,7 @@ form.onsubmit = async (eve) => {
 window.onload = async () => {
     console.log('localStorage.token:', localStorage.token)
     console.log('sessionStorage.id: ', sessionStorage.id) 
+    console.log('sessionStorage.username: ', sessionStorage.username)
     if (!sessionStorage.id) {
         window.location.href = 'input.html'
     }

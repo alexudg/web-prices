@@ -3,11 +3,13 @@ btStatusClose.onclick = () => {
 }
 
 function updateSession(user, isChangeToken=false) {
+    console.log('user: ', user)
     console.log('localStorage.token antes de actualizar: ', localStorage.token)
     console.log('sessionStorage.id antes de actualizar: ', sessionStorage.id)
     if (isChangeToken)
         localStorage.setItem('token', user.token)
-    sessionStorage.setItem('id', user.id)
+    sessionStorage.id = user.id
+    sessionStorage.username = user.username
     console.log('localStorage.token despues de actualizar: ', localStorage.token)
     console.log('sessionStorage.id despues de actualizar: ', sessionStorage.id)
     window.location.replace('dashboard.html')
@@ -15,10 +17,10 @@ function updateSession(user, isChangeToken=false) {
 
 async function loadSession() {
     console.log('token antes del request: ', localStorage.token)
-    const response = await executeGet('src/php/db.php?fn=getUserId&token=' + localStorage.token) // {id: <int>}
+    const response = await executeGet('src/php/db.php?fn=getUserData&token=' + localStorage.token) // {id: <int>}
     console.log('response: ', response)
-    if (response.id) {
-        console.log('id dueña de token')
+    if (response.success) {
+        console.log('id dueña de token:', response.user.id)
         updateSession(response)        
     }
     // si no existe id asociado al token, elimnar token y que vuelva a inicar sesion
@@ -33,13 +35,13 @@ form.onsubmit = async (eve) => {
     eve.preventDefault()
     //console.log('submit')
     let formData = new FormData(form)
-    formData.append('fn', 'isNamePass')
+    formData.append('fn', 'isUserExists')
     const response = await executePost('src/php/db.php', formData)
-    console.log('response: ', response)
-    if (response.result) {
+    //console.log('response: ', response) // {success: true|false, user:null|{id:<int>, username:<string>, token:<8-digits>}}
+    if (response.success) {
         // save data
         console.log('contraseña correcta, dar de alta token e id')
-        updateSession(response.user, true)
+        updateSession(response.user, true) 
         showStatus('Bienvenido', false)
     }
     else {

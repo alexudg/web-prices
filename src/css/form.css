@@ -20,7 +20,8 @@
     border-radius: 5px;
 }
 
-.form__form input[type=submit] {
+.form__form input[type=submit],
+.form__buttons > button:first-child {
     background-color: blue;
     color: white;
     height: 35px;
@@ -40,6 +41,7 @@
 /* width 100% */
 .form__buttons {
     /* background-color: silver; */
+    /* height: 50px; */
     margin-top: 10px;
     display: flex;
     justify-content: space-between;  
@@ -47,17 +49,20 @@
 }
 
 .form__buttons > [type=submit],
-.form__buttons > [type=button] {
+.form__buttons > [type=button],
+.form__buttons > button {
     width: 45%;
     border: none;
     border-radius: 5px;    
 }
 
-.form__form input[type=button] {
+.form__form input[type=button],
+.form__buttons > button {
     height: 35px;     
 }
 
-.form__form input[type=button]:hover {
+.form__form input[type=button]:hover,
+.form__buttons > button {
     cursor: pointer;
 }
 

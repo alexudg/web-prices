@@ -40,7 +40,7 @@
         </table>
         <section class="modal" id="modal">
             <div class="form">
-                <h4 id="formTitle">Agregar producto</h4>
+                <h4 id="formTitle">Agregar artículo</h4>
                 <form class="form__form" id="form">
                     <input type="number" name="id"> <!-- 0=insert, >0 update -->
                     <input type="text" name="code" placeholder="Código">
@@ -55,6 +55,22 @@
                 <div class="form__status" id="statusArea">
                     <span class="form__status-close" id="btCloseStatus">x</span>
                     <p class="modal__status-text" id="statusText">Lorem ipsum dolor sit amet consectetur adipisicing elit. Ad et recusandae, illo itaque repudiandae quo vel quis eius iste. Sunt provident asperiores saepe, vero suscipit distinctio impedit fuga mollitia itaque!</p>
+                </div>
+            </div>
+        </section>
+        <section class="modal" id="modalDel">
+            <div class="form">
+                <h4>Eliminar artículo</h4>
+                <input type="text" id="idToDel">
+                <h4>Estás segur@ de eliminar el artículo</h4>
+                <h4 id="descriptionToDel"></h4>
+                <div class="form__buttons">
+                    <button id="btOkDel">Eliminar</button>
+                    <button id="btCancelDel">Cancelar</button>
+                </div>
+                <div class="form__status" id="statusDelArea">
+                    <span class="form__status-close" id="btCloseStatusDel">x</span>
+                    <p class="modal__status-text" id="statusDelText">Lorem ipsum dolor sit amet consectetur adipisicing elit. Ad et recusandae, illo itaque repudiandae quo vel quis eius iste. Sunt provident asperiores saepe, vero suscipit distinctio impedit fuga mollitia itaque!</p>
                 </div>
             </div>
         </section>
