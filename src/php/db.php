@@ -21,6 +21,9 @@ if (!empty($_GET) and isset($_GET['fn'])) {
         case 'getFamilies':
             getFamilies();
             break;
+        case 'isFamilyExists':
+            isFamilyExists($_GET['description'], $_GET['id']);
+            break;
     }
     exit();
 }
@@ -41,7 +44,7 @@ else if (!empty($_POST) and isset($_POST['fn'])) {
 }
 
 function isUserExists($username, $pass) {
-    $result = array('success' => false, 'user' => null);
+    $response = array('success' => false, 'user' => null);
     $usersPath = '../json/users.json';
     if (file_exists($usersPath)) {
         $users = json_decode(file_get_contents($usersPath));
@@ -59,19 +62,19 @@ function isUserExists($username, $pass) {
                 for ($i=0; $i < 8; $i++)
                     $token .= dechex(rand(0, 15));
                 $users[$key]->token = $token; # save token in user register   
-                $result['success'] = true;
-                $result['user']['id'] = $users[$key]->id;
-                $result['user']['username'] = $users[$key]->username;
-                $result['user']['token'] = $token;
+                $response['success'] = true;
+                $response['user']['id'] = $users[$key]->id;
+                $response['user']['username'] = $users[$key]->username;
+                $response['user']['token'] = $token;
                 file_put_contents($usersPath, json_encode($users, JSON_PRETTY_PRINT));
             }
         }    
     }
-    exit(json_encode($result));
+    exit(json_encode($response));
 }
 
 function getUserData($token) {
-    $result = array('success' => false, 'user' => null);
+    $response = array('success' => false, 'user' => null);
     $usersPath = '../json/users.json';
     if (file_exists($usersPath)) {
         $users = json_decode(file_get_contents($usersPath));
@@ -80,16 +83,16 @@ function getUserData($token) {
         
         # key=false puede pasar x cero, comparacion estricta
         if ($key === 0 or $key > 0) { 
-            $result['success'] = true;
-            $result['user']['id'] = $users[$key]->id;
-            $result['user']['username'] = $users[$key]->username;
+            $response['success'] = true;
+            $response['user']['id'] = $users[$key]->id;
+            $response['user']['username'] = $users[$key]->username;
         }
     }
-    exit(json_encode($result));    
+    exit(json_encode($response));    
 }
 
 function isCodeExists($code, $id) {
-    $result = array('success' => false, 'description' => null);
+    $response = array('success' => false, 'description' => null);
     $articles = json_decode(file_get_contents('../json/articles.json')); # array of objects, inicia con key=0
     $codes = array_column($articles, 'code'); # array of all codes
     $key = array_search($code, $codes); # id<int> | false
@@ -99,42 +102,42 @@ function isCodeExists($code, $id) {
         $article = $articles[$key]; # tomar el objeto del articulo que tiene el mismo codigo
         # verificar si el id es diferente, entonces el codigo es de otro articulo
         if ($article->id != $id)  {
-            $result['success'] = true;
-            $result['description'] = $article->description;        
+            $response['success'] = true;
+            $response['description'] = $article->description;        
         }        
     }
-    exit(json_encode($result));
+    exit(json_encode($response));
 }
 
 function isDescriptionExists($description, $id) {
-    $result = array('success' => false);
+    $response = array('success' => false);
     $articles = json_decode(file_get_contents('../json/articles.json')); # array of objects, inicia con key=0
     $description = strtoupper($description); # comparacion en mayusculas
     foreach($articles as $article) {
         if ($description == strtoupper($article->description)) {
             if ($id != $article->id) 
-                $result['success'] = true;
+                $response['success'] = true;
             break;
         }
     }    
-    exit(json_encode($result));
+    exit(json_encode($response));
 }
 
 function getFamilyDescription($id) {
-    $result = '';
+    $response = '';
     $familiesPath = '../json/families.json';
     if (file_exists($familiesPath)) {
         $families = json_decode(file_get_contents($familiesPath));
         $ids = array_column($families, 'id'); # array of id's
         $key = array_search($id, $ids);
         if ($key === 0 or $key > 0) 
-            $result = $families[$key]->description;
+            $response = $families[$key]->description;
     }
-    return $result;
+    return $response;
 }
 
 function addUpdateArticle($article) {
-    $result = array('success' => false);
+    $response = array('success' => false);
     $articlesPath = '../json/articles.json';
     if (file_exists($articlesPath)) {
         $articles = json_decode(file_get_contents($articlesPath));
@@ -170,14 +173,14 @@ function addUpdateArticle($article) {
         }    
         if ($isContinue) {
             file_put_contents($articlesPath, json_encode($articles, JSON_PRETTY_PRINT));
-            $result['success'] = true;
+            $response['success'] = true;
         }
     }
-    exit(json_encode($result));    
+    exit(json_encode($response));    
 }
 
 function getArticles($txt) {
-    $result = array('success' => false, 'articles' => null);
+    $response = array('success' => false, 'articles' => null);
     $articlesPath = '../json/articles.json';
     if (file_exists($articlesPath)) {
         $articles = json_decode(file_get_contents($articlesPath));
@@ -188,7 +191,7 @@ function getArticles($txt) {
         });
 
         if (strlen($txt) > 0) {        
-            $result['articles'] = array();
+            $response['articles'] = array();
             $txt = strtoupper($txt); # comparacion en mayusculas
             foreach($articles as $article) {
                 # is objet, not array
@@ -197,20 +200,20 @@ function getArticles($txt) {
 
                 # estrictamente igual a cero entero, ya que cero es false
                 if ($posCode === 0 or $posCode > 0 or $posDescription === 0 or $posDescription > 0) 
-                    array_push($result['articles'], $article);                            
+                    array_push($response['articles'], $article);                            
             }
-            $result['success'] = true;
+            $response['success'] = true;
         }
         else {
-            $result['success'] = true;
-            $result['articles'] = $articles;
+            $response['success'] = true;
+            $response['articles'] = $articles;
         }
     }    
-    exit(json_encode($result));
+    exit(json_encode($response));
 }
 
 function getArticle($id) {
-    $result = array('success' => false, 'article' => null);
+    $response = array('success' => false, 'article' => null);
     $articlesPath = '../json/articles.json';
     if (file_exists($articlesPath)) {
         $articles = json_decode(file_get_contents($articlesPath));
@@ -219,15 +222,15 @@ function getArticle($id) {
         
         # estrictamente igual a cero entero ya que tambien es false
         if ($key === 0 or $key > 0) {
-            $result['success'] = true;
-            $result['article'] = $articles[$key];
+            $response['success'] = true;
+            $response['article'] = $articles[$key];
         }
     }
     exit(json_encode($result));
 }
 
 function delArticle($id) {
-    $result = array('success' => false);
+    $response = array('success' => false);
     $articlesPath = '../json/articles.json';
     if (file_exists($articlesPath)) {
         $articles = json_decode(file_get_contents($articlesPath));
@@ -237,10 +240,10 @@ function delArticle($id) {
         if ($key === 0 or $key > 0) { 
             array_splice($articles, $key, 1); # eliminar desde key, 1 elemento
             file_put_contents($articlesPath, json_encode($articles, JSON_PRETTY_PRINT));
-            $result['success'] = true;
+            $response['success'] = true;
         }
     } 
-    exit(json_encode($result));
+    exit(json_encode($response));
 }
 
 function getFamilies() {
@@ -258,6 +261,22 @@ function getFamilies() {
         $response['families'] = $families;
     }
     exit(json_encode($response));
+}
+
+function isFamilyExists($description, $id) {
+    $response = array('sucess' => false);
+    $familiesPath = '../json/families.json';
+    if (file_exists($familiesPath)) {
+        $families = json_decode(file_get_contents($familiesPath));
+        $description = strtoupper($description); # comparacion en mayusculas
+        foreach ($families as $family) {
+            if (strtoupper($family->description) == $description and $family->id != $id) {
+                $response['success'] = true;
+                break;
+            }
+        }
+    }
+    exit(json_encode($response)); 
 }
 
 ?>

@@ -1,49 +1,9 @@
 [
     {
         "id": 1,
-        "code": "1",
-        "description": "uno",
-        "price": 1.1,
-        "id_family": 1,
+        "code": "0001",
+        "description": "atun dolores chico",
+        "price": 18,
         "family": "abarrotes"
-    },
-    {
-        "id": 2,
-        "code": "2",
-        "description": "dos",
-        "price": 2.2,
-        "id_family": 1,
-        "family": "abarrotes"
-    },
-    {
-        "id": 3,
-        "code": "3",
-        "description": "tres",
-        "price": 3.3,
-        "id_family": 2,
-        "family": "abarrotes"
-    },
-    {
-        "id": 4,
-        "code": "4",
-        "description": "cuatro",
-        "price": 4.4,
-        "families": "2",
-        "family": "abarrotes"
-    },
-    {
-        "id": 5,
-        "code": "5",
-        "description": "cinco",
-        "price": 5.5,
-        "id_family": "2",
-        "family": "abarrotes"
-    },
-    {
-        "id": 6,
-        "code": "10",
-        "description": "diez",
-        "price": 10.1,
-        "family": "cervezas"
     }
 ]

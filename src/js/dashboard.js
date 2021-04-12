@@ -45,8 +45,8 @@ async function loadArticles() {
                                     <td class="price">${article.price.toFixed(2)}</td>
                                     <td>${article.family}</td>
                                     <td>
-                                        <button class="bt-edit" onclick="editArticle(${article.id})">Modificar</button>
-                                        <button class="bt-del" onclick="delArticle(${article.id}, '${article.description}')">Eliminar</button>
+                                        <button class="bt-edit" onclick="editArticle(${article.id})"><img src="src/img/edit24px.png" alt="Editar" title="Editar"></button>
+                                        <button class="bt-del" onclick="delArticle(${article.id}, '${article.description}')"><img src="src/img/trash24px.png" alt="Eliminar" title="Eliminar"></button>
                                     </td>
                                 </tr>`
         });
@@ -59,6 +59,36 @@ async function loadArticles() {
         countArticles.innerHTML += ' con el texto <b>' + searchArticle.value.trim() + '</b>'
     }
     searchArticle.value = ''
+}
+
+function addFamily() {
+    //console.log('addFamily')
+    formFamilyTitle.innerText = 'Agregar familia'
+    formFamily.id.value = '0'
+    formFamily.description.value = ''
+    modalAddEditFamily.style.display = 'flex'
+    formFamily.description.focus()
+}
+
+function editFamily(id, description) {
+    //console.log('editFamily', id, description)
+    formFamilyTitle.innerText = 'Editar familia'
+    formFamily.id.value = id
+    formFamily.description.value = description
+    modalAddEditFamily.style.display = 'flex'
+    formFamily.description.focus()
+}
+
+function delFamily(id, description) {
+    console.log('delFamily', id, description)
+}
+
+function closeModalFamilies() {
+    modalFamilies.click()
+}
+
+function closeModalAddEditFamily() {
+    modalAddEditFamily.click()
 }
 
 btCancel.onclick = () => {
@@ -117,6 +147,54 @@ btCloseStatus.onclick = () => {
 btCloseStatusDel.onclick = () => {
     //console.log('closeStatus')
     statusDelArea.style.display = 'none'
+}
+
+btEditFamilies.onclick = async (eve) => {
+    eve.preventDefault()
+    //console.log('click')
+
+    // cargar familias en la tabla de edicion
+    const response = await executeGet('src/php/db.php?fn=getFamilies')
+    //console.log(response) {success: false|true, families: null|[{},{}]}
+    if (response.success) {
+        tbodyFamilies.innerHTML = ''
+        response.families.forEach(family => {
+            tbodyFamilies.innerHTML += `<tr>
+                                            <td>${family.description}</td>
+                                            <td>
+                                                <button class="bt-edit" onclick="editFamily(${family.id}, '${family.description}')"><img src="src/img/edit24px.png" alt="Editar" title="Editar"></button>
+                                                <button class="bt-del" onclick="delFamily(${family.id}, '${family.description}')"><img src="src/img/trash24px.png" alt="Eliminar" title="Eliminar"></button>
+                                            </td>
+                                        </tr>`
+        })
+        footTextFamilies.innerText = response.families.length
+        footTextFamilies.innerText += ' familia' 
+        if (response.families.length != 1)
+            footTextFamilies.innerText += 's'
+        footTextFamilies.innerText += ' encontradas.'
+        modalFamilies.style.display = 'flex'
+    }
+}
+
+modalFamilies.onclick = (eve) => {
+    if (eve.target == modalFamilies) {
+        modalFamilies.style.display = 'none'
+    }
+}
+
+modalAddEditFamily.onclick = (eve) => {
+    if (eve.target == modalAddEditFamily) {
+        modalAddEditFamily.style.display = 'none'
+    }
+}
+
+formFamily.onsubmit = (eve) => {
+    eve.preventDefault()
+    //console.log('submit')
+    
+    // verificar si ya existe la description
+    const response = await executeGet('src/php/db.php?fn=isFamilyExists&description=' + formFamily.description.value + '&id=' + formFamily.id.value)
+    console.log(response)
 }
 
 form.onsubmit = async (eve) => {
