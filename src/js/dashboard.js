@@ -137,9 +137,7 @@ btOkDel.onclick = async () => {
         showStatusDel('El artículo ha sido eliminado.', false) // form.js
         setTimeout(() => {
             modalDel.click() // se genera el param 'eve'
-            if (txt == '')
-                txt = '*'
-            searchArticle.value = txt   
+            searchArticle.value = txt == '' ? '*' : txt 
             loadArticles()
         }, 2500)
     }
@@ -252,12 +250,13 @@ btEditFamilies.onclick = async (eve) => {
     modalFamilies.style.display = 'flex'
 }
 
+// close modal table families
 modalFamilies.onclick = async (eve) => {
     if (eve.target == modalFamilies) {
         modalFamilies.style.display = 'none'
         //console.log('close modalFamilies, isFamiliesChanged=' + isFamiliesChanged)
 
-        // si han cambiado las familias recargar el combo
+        // si han cambiado las familias recargar el combo de familias y recargar articulos
         if (isFamiliesChanged) {
             const familyCurrent = form.family.options[form.family.selectedIndex].innerText
             //console.log(familyCurrent)
@@ -271,6 +270,10 @@ modalFamilies.onclick = async (eve) => {
                     break;
                 }
             }
+
+            // recargar articulos
+            searchArticle.value = txt == '' ? '*' : txt
+            loadArticles()            
         }
     }
 }
@@ -281,7 +284,7 @@ modalAddEditFamily.onclick = (eve) => {
     }
 }
 
-// add edit family
+// add edit family save
 formFamily.onsubmit = async (eve) => {
     eve.preventDefault()
     //console.log('submit')
@@ -306,7 +309,7 @@ formFamily.onsubmit = async (eve) => {
                 showStatusFamily(txt, false) // form.js
                 loadFamiliesTable() // recargar tabla de familias
                 setTimeout(() => {
-                    modalAddEditFamily.click() // cerrar form addEdit families
+                    modalAddEditFamily.click() // cerrar form addEdit family
                 }, 2500)
             }
             // error en post
@@ -366,9 +369,8 @@ form.onsubmit = async (eve) => {
             showStatus(statusTxt, false)
             setTimeout(() => {
                 btCancel.click()
-                if (txt == '')
-                    txt = '*'
-                searchArticle.value = txt
+                // load articles
+                searchArticle.value = txt == '' ? '*' : txt
                 loadArticles()
             }, 2500)                   
         }

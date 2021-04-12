@@ -203,9 +203,10 @@ function getArticles($txt) {
                 # is objet, not array
                 $posCode = strpos($article->code, $txt); # false|<int>
                 $posDescription = strpos(strtoupper($article->description), $txt);
+                $posFamily = strpos(strtoupper($article->family), $txt);
 
                 # estrictamente igual a cero entero, ya que cero es false
-                if ($posCode === 0 or $posCode > 0 or $posDescription === 0 or $posDescription > 0) 
+                if ($posCode === 0 or $posCode > 0 or $posDescription === 0 or $posDescription > 0 or $posFamily === 0 or $posFamily > 0) 
                     array_push($response['articles'], $article);                            
             }
             $response['success'] = true;
@@ -316,13 +317,14 @@ function addUpdateFamily($id, $description) {
                 $family->description = $description;
 
                 # update article.family with descriptionOld
-                $articlesPath = '../src/json/articles.json';
+                $articlesPath = '../json/articles.json';
                 if (file_exists($articlesPath)) {
                     $articles = json_decode(file_get_contents($articlesPath));
                     foreach ($articles as $article) {
                         if ($article->family == $descriptionOld)
                             $article->family = $description;
                     }
+                    file_put_contents($articlesPath, json_encode($articles, JSON_PRETTY_PRINT));
                 }
 
                 $isContinue = true;

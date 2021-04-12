@@ -4,20 +4,20 @@
         "code": "01",
         "description": "articulo uno",
         "price": 11.1,
-        "family": "familia uno"
+        "family": "abarrotes"
     },
     {
         "id": 2,
         "code": "02",
         "description": "articulo dos",
         "price": 22.2,
-        "family": "familia dos"
+        "family": "cervezas"
     },
     {
         "id": 3,
         "code": "03",
         "description": "articulo tres",
-        "price": 33.3,
-        "family": "familia tres"
+        "price": 50,
+        "family": "sabritas"
     }
 ]

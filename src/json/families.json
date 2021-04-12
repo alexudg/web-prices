@@ -1,14 +1,14 @@
 [
     {
         "id": 1,
-        "description": "familia 1"
+        "description": "abarrotes"
     },
     {
         "id": 2,
-        "description": "familia dos"
+        "description": "cervezas"
     },
     {
         "id": 3,
-        "description": "familia tres"
+        "description": "sabritas"
     }
 ]
