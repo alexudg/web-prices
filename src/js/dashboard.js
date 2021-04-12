@@ -1,8 +1,10 @@
 let txt = ''
+let isFamiliesChanged = false
 
 function addArticle() {
     formTitle.innerText = 'Agregar artículo'
     form.id.value = '0' // 0=agregar
+    loadSelectFamilies()
     modal.style.display = 'flex'
     form.code.focus()
 }
@@ -17,6 +19,18 @@ async function editArticle(id) {
         form.code.value = response.article.code
         form.description.value = response.article.description
         form.price.value = response.article.price
+        await loadSelectFamilies()
+
+        // seleccionar su familia
+        for (const option of form.family.options) {
+            //console.log('option: ', option.innerText, ', family: ', response.article.family);
+            if (option.innerText === response.article.family) {
+                //console.log(option.value)
+                form.family.selectedIndex = option.index;
+                break;
+            }
+        }
+
         modal.style.display = 'flex'
         form.code.focus()
     }
@@ -66,6 +80,7 @@ function addFamily() {
     formFamilyTitle.innerText = 'Agregar familia'
     formFamily.id.value = '0'
     formFamily.description.value = ''
+    statusFamilyArea.style.display = 'none'
     modalAddEditFamily.style.display = 'flex'
     formFamily.description.focus()
 }
@@ -75,12 +90,16 @@ function editFamily(id, description) {
     formFamilyTitle.innerText = 'Editar familia'
     formFamily.id.value = id
     formFamily.description.value = description
+    statusFamilyArea.style.display = 'none'
     modalAddEditFamily.style.display = 'flex'
     formFamily.description.focus()
 }
 
 function delFamily(id, description) {
-    console.log('delFamily', id, description)
+    //console.log('delFamily', id, description)
+    idFamilyDel.value = id
+    descriptionFamilyDel.innerText = description + '?'
+    modalFamilyDel.style.display = 'flex'   
 }
 
 function closeModalFamilies() {
@@ -89,6 +108,18 @@ function closeModalFamilies() {
 
 function closeModalAddEditFamily() {
     modalAddEditFamily.click()
+}
+
+async function loadSelectFamilies() {
+    // cargar familias en el combo
+    const response = await executeGet('src/php/db.php?fn=getFamilies')
+    //console.log(response) // {success: false|true, families: null|[{},{}]}
+    if (response.success) {
+        form.family.innerHTML = ''
+        response.families.forEach(family => {
+            form.family.innerHTML += `<option value="${family.id}">${family.description}</option>`
+        })
+    }    
 }
 
 btCancel.onclick = () => {
@@ -121,6 +152,31 @@ btCancelDel.onclick = () => {
     modalDel.click()
 }
 
+// confirm del family
+btOkFamilyDel.onclick = async () => {
+    //console.log('btOkDel')
+    formData = new FormData
+    formData.append('fn', 'delFamily')
+    formData.append('id', idFamilyDel.value)
+    const response = await executePost('src/php/db.php', formData) // script.js
+    //console.log(response)
+    if (response.success) {
+        isFamiliesChanged = true // cambios en families
+        showStatusFamilyDel('La familia ha sido eliminada.', false) // form.js
+        loadFamiliesTable() // recargar tabla de familias
+        setTimeout(() => {
+            // cerrar modal
+            modalFamilyDel.click() // se genera el param 'eve'            
+        }, 2500)
+    }
+    else 
+        showStatusFamilyDel() // form.js 
+}
+
+btCancelFamilyDel.onclick = () => {
+    modalFamilyDel.style.display = 'none'
+}
+
 modal.onclick = (eve) => {
     if (eve.target == modal) {
         modal.style.display = 'none'
@@ -138,6 +194,13 @@ modalDel.onclick = (eve) => {
     }
 }
 
+modalFamilyDel.onclick = (eve) => {
+    if (eve.target == modalFamilyDel) {
+        modalFamilyDel.style.display = 'none'
+        // ocultar status
+        statusFamilyDelArea.style.display = 'none'
+    }
+}
 
 btCloseStatus.onclick = () => {
     //console.log('closeStatus')
@@ -149,10 +212,15 @@ btCloseStatusDel.onclick = () => {
     statusDelArea.style.display = 'none'
 }
 
-btEditFamilies.onclick = async (eve) => {
-    eve.preventDefault()
-    //console.log('click')
+btCloseStatusFamily.onclick = () => {
+    statusFamilyArea.style.display = 'none'
+}
 
+btCloseStatusFamilyDel.onclick = () => {
+    statusFamilyDelArea.style.display = 'none'
+}
+
+async function loadFamiliesTable() {
     // cargar familias en la tabla de edicion
     const response = await executeGet('src/php/db.php?fn=getFamilies')
     //console.log(response) {success: false|true, families: null|[{},{}]}
@@ -171,14 +239,39 @@ btEditFamilies.onclick = async (eve) => {
         footTextFamilies.innerText += ' familia' 
         if (response.families.length != 1)
             footTextFamilies.innerText += 's'
-        footTextFamilies.innerText += ' encontradas.'
-        modalFamilies.style.display = 'flex'
+        footTextFamilies.innerText += ' encontradas.'        
     }
 }
 
-modalFamilies.onclick = (eve) => {
+// tabla de familias
+btEditFamilies.onclick = async (eve) => {
+    eve.preventDefault()
+    //console.log('click')
+    isFamiliesChanged = false // hay cambios en las familias?
+    await loadFamiliesTable()
+    modalFamilies.style.display = 'flex'
+}
+
+modalFamilies.onclick = async (eve) => {
     if (eve.target == modalFamilies) {
         modalFamilies.style.display = 'none'
+        //console.log('close modalFamilies, isFamiliesChanged=' + isFamiliesChanged)
+
+        // si han cambiado las familias recargar el combo
+        if (isFamiliesChanged) {
+            const familyCurrent = form.family.options[form.family.selectedIndex].innerText
+            //console.log(familyCurrent)
+            await loadSelectFamilies()
+
+            // seleccionar familia previamente seleccionada
+            for (const option of form.family.options) {
+                if (option.innerText === familyCurrent) {
+                    //console.log(option.value)
+                    form.family.selectedIndex = option.index;
+                    break;
+                }
+            }
+        }
     }
 }
 
@@ -188,13 +281,44 @@ modalAddEditFamily.onclick = (eve) => {
     }
 }
 
-formFamily.onsubmit = (eve) => {
+// add edit family
+formFamily.onsubmit = async (eve) => {
     eve.preventDefault()
     //console.log('submit')
     
     // verificar si ya existe la description
-    const response = await executeGet('src/php/db.php?fn=isFamilyExists&description=' + formFamily.description.value + '&id=' + formFamily.id.value)
-    console.log(response)
+    const description = formFamily.description.value.trim()
+    const response = await executeGet('src/php/db.php?fn=isFamilyExists&description=' + description + '&id=' + formFamily.id.value)
+    //console.log(response) // {success: false|true, exists: null|false|true}
+    if (response.success) {
+        if (!response.exists) {
+            let formData = new FormData()
+            formData.append('fn', 'addUpdateFamily')
+            formData.append('id', formFamily.id.value) // id=0 add, id>0 edit
+            formData.append('description', description)
+            const response = await executePost('src/php/db.php', formData)
+            //console.log(response) // {success: false|true}
+            if (response.success) {
+                isFamiliesChanged = true // han cambiado las familias, cargar combo al cerrar
+                const txt = formFamily.id.value == '0' 
+                    ? 'La nueva familia ha sido agregada.'
+                    : 'La familia ha sido modificada.'
+                showStatusFamily(txt, false) // form.js
+                loadFamiliesTable() // recargar tabla de familias
+                setTimeout(() => {
+                    modalAddEditFamily.click() // cerrar form addEdit families
+                }, 2500)
+            }
+            // error en post
+            else
+                showStatusFamily()
+        }
+        else
+            showStatusFamily('La familia ya existe.')
+    }
+    // error
+    else
+        showStatusFamily() // form.js
 }
 
 form.onsubmit = async (eve) => {
@@ -259,16 +383,6 @@ window.onload = async () => {
         window.location.href = 'input.html'
     }
     btDashboard.classList.add('active')
-    
-    // cargar familias
-    const response = await executeGet('src/php/db.php?fn=getFamilies')
-    //console.log(response) // {success: false|true, families: null|[{},{}]}
-    if (response.success) {
-        form.family.innerHTML = ''
-        response.families.forEach(family => {
-            form.family.innerHTML += `<option value="${family.id}">${family.description}</option>`
-        })
-    }    
     searchArticle.focus()
     //searchArticle.value = '*'
     //loadArticles()    

@@ -27,6 +27,11 @@
 
 .form__form > select {
     width:70%;
+    font-size: 12pt;
+}
+
+.form__form > select > option {
+    font-size: 12pt;
 }
 
 .form__form > button {

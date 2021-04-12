@@ -1,9 +1,23 @@
 [
     {
         "id": 1,
-        "code": "0001",
-        "description": "atun dolores chico",
-        "price": 18,
-        "family": "abarrotes"
+        "code": "01",
+        "description": "articulo uno",
+        "price": 11.1,
+        "family": "familia uno"
+    },
+    {
+        "id": 2,
+        "code": "02",
+        "description": "articulo dos",
+        "price": 22.2,
+        "family": "familia dos"
+    },
+    {
+        "id": 3,
+        "code": "03",
+        "description": "articulo tres",
+        "price": 33.3,
+        "family": "familia tres"
     }
 ]

@@ -38,7 +38,7 @@
                 </tr>
             </tfoot>    
         </table>
-        <section class="modal" id="modal" style="display: flex;">
+        <section class="modal" id="modal">
             <div class="form">
                 <h4 id="formTitle">Agregar artículo</h4>
                 <form class="form__form" id="form">
@@ -79,7 +79,7 @@
                 </div>
             </div>
         </section>
-        <section class="modal" id="modalFamilies" style="display: flex;">
+        <section class="modal" id="modalFamilies">
             <div class="table-portrait">
                 <table>
                     <caption>Familias<button onclick="addFamily()">Agregar</button> </caption>
@@ -105,7 +105,7 @@
             <div class="form">
                 <h4 id="formFamilyTitle">Agregar familia</h4>
                 <form class="form__form" id="formFamily">
-                    <input type="text" name="id"> <!-- 0=insert, >0 update -->
+                    <input type="hidden" name="id"> <!-- 0=insert, >0 update -->
                     <input type="text" name="description" placeholder="*Descripción" required>
                     <h5>*Campo obligatorio</h5>
                     <div class="form__buttons">
@@ -116,6 +116,22 @@
                 <div class="form__status" id="statusFamilyArea">
                     <span class="form__status-close" id="btCloseStatusFamily">x</span>
                     <p class="modal__status-text" id="statusFamilyText">Lorem ipsum dolor sit amet consectetur adipisicing elit. Ad et recusandae, illo itaque repudiandae quo vel quis eius iste. Sunt provident asperiores saepe, vero suscipit distinctio impedit fuga mollitia itaque!</p>
+                </div>
+            </div>
+        </section>
+        <section class="modal" id="modalFamilyDel">
+            <div class="form">
+                <h4>Eliminar familia</h4>
+                <input type="hidden" id="idFamilyDel">
+                <p>¿Estás segur@ de eliminar la familia...</p>
+                <h4 id="descriptionFamilyDel"></h4>
+                <div class="form__buttons">
+                    <button id="btOkFamilyDel">Eliminar</button>
+                    <button id="btCancelFamilyDel">Cancelar</button>
+                </div>
+                <div class="form__status" id="statusFamilyDelArea">
+                    <span class="form__status-close" id="btCloseStatusFamilyDel">x</span>
+                    <p class="modal__status-text" id="statusFamilyDelText">Lorem ipsum dolor sit amet consectetur adipisicing elit. Ad et recusandae, illo itaque repudiandae quo vel quis eius iste. Sunt provident asperiores saepe, vero suscipit distinctio impedit fuga mollitia itaque!</p>
                 </div>
             </div>
         </section>

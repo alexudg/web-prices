@@ -11,3 +11,17 @@ function showStatusDel(txt='Ocurrió un error de comunicación', isError=true) {
     statusDelArea.style.backgroundColor = color
     statusDelArea.style.display = 'block'
 }
+
+function showStatusFamily(txt='Ocurrió un error de comunicación', isError=true) {
+    const color = isError ? 'salmon' : 'lightgreen'
+    statusFamilyText.innerHTML = txt
+    statusFamilyArea.style.backgroundColor = color
+    statusFamilyArea.style.display = 'block'
+}
+
+function showStatusFamilyDel(txt='Ocurrió un error de comunicación', isError=true) {
+    const color = isError ? 'salmon' : 'lightgreen'
+    statusFamilyDelText.innerHTML = txt
+    statusFamilyDelArea.style.backgroundColor = color
+    statusFamilyDelArea.style.display = 'block'
+}

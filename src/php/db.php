@@ -39,6 +39,12 @@ else if (!empty($_POST) and isset($_POST['fn'])) {
         case 'delArticle':
             delArticle($_POST['id']);
             break;
+        case 'addUpdateFamily':
+            addUpdateFamily($_POST['id'], $_POST['description']);
+            break;
+        case 'delFamily':
+            delFamily($_POST['id']);
+            break;
     }
     exit();
 }
@@ -226,7 +232,7 @@ function getArticle($id) {
             $response['article'] = $articles[$key];
         }
     }
-    exit(json_encode($result));
+    exit(json_encode($response));
 }
 
 function delArticle($id) {
@@ -264,19 +270,87 @@ function getFamilies() {
 }
 
 function isFamilyExists($description, $id) {
-    $response = array('sucess' => false);
+    $response = array('success' => false, 'exists' => null);
     $familiesPath = '../json/families.json';
     if (file_exists($familiesPath)) {
         $families = json_decode(file_get_contents($familiesPath));
         $description = strtoupper($description); # comparacion en mayusculas
+        $response['success'] = true;
+        $response['exists'] = false;
         foreach ($families as $family) {
             if (strtoupper($family->description) == $description and $family->id != $id) {
-                $response['success'] = true;
+                $response['exists'] = true;
                 break;
             }
         }
     }
     exit(json_encode($response)); 
+}
+
+function addUpdateFamily($id, $description) {
+    $response = array('success' => false);
+    $familiesPath = '../json/families.json';
+    if (file_exists($familiesPath)) {
+        $families = json_decode(file_get_contents($familiesPath));
+        $isContinue = false;
+        # add
+        if ($id == '0') {
+            if (count($families) > 0) 
+                # encontrar el max id + 1
+                $id = end($families)->id + 1; # ultimo objeto del array
+            else 
+                $id = 1;
+            $family = array('id' => $id, 'description' => $description);
+            array_push($families, $family);
+            $isContinue = true;
+        }
+        # update
+        else {
+            $id = intval($id);
+            $ids = array_column($families, 'id'); # array de ids de families
+            $key = array_search($id, $ids); # key del objeto con el mismo id
+            # key estrictamente igual a cero, ya que cero es false
+            if ($key === 0 or $key > 0) {
+                $family = $families[$key];
+                $descriptionOld = $family->description;
+                $family->description = $description;
+
+                # update article.family with descriptionOld
+                $articlesPath = '../src/json/articles.json';
+                if (file_exists($articlesPath)) {
+                    $articles = json_decode(file_get_contents($articlesPath));
+                    foreach ($articles as $article) {
+                        if ($article->family == $descriptionOld)
+                            $article->family = $description;
+                    }
+                }
+
+                $isContinue = true;
+            }
+        }
+        if ($isContinue) {
+            file_put_contents($familiesPath, json_encode($families, JSON_PRETTY_PRINT));
+            $response['success'] = true;
+        }
+    }
+    exit(json_encode($response));
+}
+
+function delFamily($id) {
+    $response = array('success' => false);
+    $familiesPath = '../json/families.json';
+    if (file_exists($familiesPath)) {
+        $families = json_decode(file_get_contents($familiesPath));
+        $ids = array_column($families, 'id'); # array de id's 
+        $key = array_search($id, $ids);
+        # estrictamente igual a cero, ya que false es cero tambien
+        if ($key === 0 or $key > 0) { 
+            array_splice($families, $key, 1); # eliminar desde key, 1 elemento
+            file_put_contents($familiesPath, json_encode($families, JSON_PRETTY_PRINT));
+            $response['success'] = true;
+        }
+    } 
+    exit(json_encode($response));
 }
 
 ?>
