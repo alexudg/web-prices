@@ -1,5 +1,4 @@
 let txt = ''
-let isFamiliesChanged = false
 
 function addArticle() {
     formTitle.innerText = 'Agregar artículo'
@@ -75,30 +74,31 @@ async function loadArticles() {
     searchArticle.value = ''
 }
 
-function addFamily() {
-    //console.log('addFamily')
+function addFamily(event) {
+    event.preventDefault()
+    //console.log('addFamily')    
     formFamilyTitle.innerText = 'Agregar familia'
-    formFamily.id.value = '0'
+    formFamily.id.value = '0' // 0=add
     formFamily.description.value = ''
-    statusFamilyArea.style.display = 'none'
     modalAddEditFamily.style.display = 'flex'
     formFamily.description.focus()
 }
 
-function editFamily(id, description) {
-    //console.log('editFamily', id, description)
+function editFamily(event) {
+    event.preventDefault()
+    //console.log('editFamily')
     formFamilyTitle.innerText = 'Editar familia'
-    formFamily.id.value = id
-    formFamily.description.value = description
-    statusFamilyArea.style.display = 'none'
+    formFamily.id.value = form.family.options[form.family.selectedIndex].value // id a modificar
+    formFamily.description.value = form.family.options[form.family.selectedIndex].innerText
     modalAddEditFamily.style.display = 'flex'
     formFamily.description.focus()
 }
 
-function delFamily(id, description) {
-    //console.log('delFamily', id, description)
-    idFamilyDel.value = id
-    descriptionFamilyDel.innerText = description + '?'
+function delFamily(event) {
+    event.preventDefault()
+    //console.log('delFamily')
+    idFamilyDel.value = form.family.options[form.family.selectedIndex].value // id a eliminar
+    descriptionFamilyDel.innerText = form.family.options[form.family.selectedIndex].innerText + '?'
     modalFamilyDel.style.display = 'flex'   
 }
 
@@ -115,6 +115,9 @@ async function loadSelectFamilies() {
     const response = await executeGet('src/php/db.php?fn=getFamilies')
     //console.log(response) // {success: false|true, families: null|[{},{}]}
     if (response.success) {
+        const visibility =  response.families.length > 0 ? 'visible' : 'hidden'
+        btEditFamily.style.visibility = visibility
+        btDelFamily.style.visibility = visibility
         form.family.innerHTML = ''
         response.families.forEach(family => {
             form.family.innerHTML += `<option value="${family.id}">${family.description}</option>`
@@ -159,9 +162,8 @@ btOkFamilyDel.onclick = async () => {
     const response = await executePost('src/php/db.php', formData) // script.js
     //console.log(response)
     if (response.success) {
-        isFamiliesChanged = true // cambios en families
         showStatusFamilyDel('La familia ha sido eliminada.', false) // form.js
-        loadFamiliesTable() // recargar tabla de familias
+        loadSelectFamilies() // reload families into combo
         setTimeout(() => {
             // cerrar modal
             modalFamilyDel.click() // se genera el param 'eve'            
@@ -218,69 +220,10 @@ btCloseStatusFamilyDel.onclick = () => {
     statusFamilyDelArea.style.display = 'none'
 }
 
-async function loadFamiliesTable() {
-    // cargar familias en la tabla de edicion
-    const response = await executeGet('src/php/db.php?fn=getFamilies')
-    //console.log(response) {success: false|true, families: null|[{},{}]}
-    if (response.success) {
-        tbodyFamilies.innerHTML = ''
-        response.families.forEach(family => {
-            tbodyFamilies.innerHTML += `<tr>
-                                            <td>${family.description}</td>
-                                            <td>
-                                                <button class="bt-edit" onclick="editFamily(${family.id}, '${family.description}')"><img src="src/img/edit24px.png" alt="Editar" title="Editar"></button>
-                                                <button class="bt-del" onclick="delFamily(${family.id}, '${family.description}')"><img src="src/img/trash24px.png" alt="Eliminar" title="Eliminar"></button>
-                                            </td>
-                                        </tr>`
-        })
-        footTextFamilies.innerText = response.families.length
-        footTextFamilies.innerText += ' familia' 
-        if (response.families.length != 1)
-            footTextFamilies.innerText += 's'
-        footTextFamilies.innerText += ' encontradas.'        
-    }
-}
-
-// tabla de familias
-btEditFamilies.onclick = async (eve) => {
-    eve.preventDefault()
-    //console.log('click')
-    isFamiliesChanged = false // hay cambios en las familias?
-    await loadFamiliesTable()
-    modalFamilies.style.display = 'flex'
-}
-
-// close modal table families
-modalFamilies.onclick = async (eve) => {
-    if (eve.target == modalFamilies) {
-        modalFamilies.style.display = 'none'
-        //console.log('close modalFamilies, isFamiliesChanged=' + isFamiliesChanged)
-
-        // si han cambiado las familias recargar el combo de familias y recargar articulos
-        if (isFamiliesChanged) {
-            const familyCurrent = form.family.options[form.family.selectedIndex].innerText
-            //console.log(familyCurrent)
-            await loadSelectFamilies()
-
-            // seleccionar familia previamente seleccionada
-            for (const option of form.family.options) {
-                if (option.innerText === familyCurrent) {
-                    //console.log(option.value)
-                    form.family.selectedIndex = option.index;
-                    break;
-                }
-            }
-
-            // recargar articulos
-            searchArticle.value = txt == '' ? '*' : txt
-            loadArticles()            
-        }
-    }
-}
-
 modalAddEditFamily.onclick = (eve) => {
     if (eve.target == modalAddEditFamily) {
         modalAddEditFamily.style.display = 'none'
+        statusFamilyArea.style.display = 'none'
     }
 }
 
@@ -289,7 +232,7 @@ formFamily.onsubmit = async (eve) => {
     eve.preventDefault()
     //console.log('submit')
     
-    // verificar si ya existe la description
+    // verificar si ya existe la family
     const description = formFamily.description.value.trim()
     const response = await executeGet('src/php/db.php?fn=isFamilyExists&description=' + description + '&id=' + formFamily.id.value)
     //console.log(response) // {success: false|true, exists: null|false|true}
@@ -302,12 +245,45 @@ formFamily.onsubmit = async (eve) => {
             const response = await executePost('src/php/db.php', formData)
             //console.log(response) // {success: false|true}
             if (response.success) {
-                isFamiliesChanged = true // han cambiado las familias, cargar combo al cerrar
                 const txt = formFamily.id.value == '0' 
                     ? 'La nueva familia ha sido agregada.'
                     : 'La familia ha sido modificada.'
                 showStatusFamily(txt, false) // form.js
-                loadFamiliesTable() // recargar tabla de familias
+
+                // si fue una modificacion, tomar el id actual
+                let idCurrent = '0';
+                if (formFamily.id.value != '0') {
+                    idCurrent = form.family.options[form.family.selectedIndex].value
+                    //console.log('id antes de modificar: ', idCurrent)
+                }
+                await loadSelectFamilies() // recargar familias en el combo
+                
+                // si recien agregada, seleccionar la de value mayor
+                if (formFamily.id.value == '0') {
+                    let idMax = 0
+                    let index = 0
+                    for (const option of form.family.options) {
+                        //console.log(option)
+                        if (idMax < parseInt(option.value)) {
+                            idMax = parseInt(option.value)
+                            index = option.index
+                        }    
+                    }
+                    //console.log(index)
+                    form.family.selectedIndex = index
+                }
+                // seleccionar el mismo value(id) antes de ser modificado
+                else {
+                    //console.log('id a encontrar despues de modificar: ', idCurrent)
+                    for (const option of form.family.options) {
+                        if (option.value == idCurrent) {
+                            //console.log('option.value=', option.value)
+                            form.family.selectedIndex = option.index
+                            break; 
+                        }    
+                    }
+                }
+                
                 setTimeout(() => {
                     modalAddEditFamily.click() // cerrar form addEdit family
                 }, 2500)

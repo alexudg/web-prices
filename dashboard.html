@@ -47,10 +47,16 @@
                     <input type="text" name="description" placeholder="*Descripción" required>
                     <input type="number" name="price" step="0.1" placeholder="*Precio" required>
                     <label for="selFamilies">*Familia</label>
-                    <select name="family" required>
-                        <!-- combo con las familias -->
-                    </select>
-                    <button id="btEditFamilies">Editar</button>
+                    <div class="form__families">
+                        <select name="family" required>
+                            <!-- combo con las familias -->
+                        </select>
+                        <div class="form__families__buttons">
+                            <button onclick="addFamily(event)"><img src="src/img/add24px.png" alt="Agregar" title="Agregar"></button>
+                            <button onclick="editFamily(event)" id="btEditFamily"><img src="src/img/edit24px.png" alt="Modificar" title="Modificar"></button>
+                            <button onclick="delFamily(event)" id="btDelFamily"><img src="src/img/trash24px.png" alt="Eliminar" title="Eliminar"></button>
+                        </div>
+                    </div>
                     <h5>*Campos obligatorios</h5>
                     <div class="form__buttons">
                         <input type="submit" value="Guardar">
@@ -79,28 +85,7 @@
                 </div>
             </div>
         </section>
-        <section class="modal" id="modalFamilies">
-            <div class="table-portrait">
-                <table>
-                    <caption>Familias<button onclick="addFamily()">Agregar</button> </caption>
-                    <thead>
-                        <tr>
-                            <th>Descripción</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tbodyFamilies">
-                        <!-- lista de familias -->
-                    </tbody>
-                    <tfoot>
-                        <tr>
-                            <td colspan="2" id="footTextFamilies">foot</td>
-                        </tr>
-                    </tfoot>
-                </table>
-                <button onclick="closeModalFamilies()">Cerrar</button>
-            </div>
-        </section>
+        
         <section class="modal" id="modalAddEditFamily">
             <div class="form">
                 <h4 id="formFamilyTitle">Agregar familia</h4>
