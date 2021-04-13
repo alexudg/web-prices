@@ -34,13 +34,13 @@ async function executePost(url, data, isText=false) {
 }
 
 let html = `<img src="src/img/logo300x243px.png" alt="">
-            <nav>`
-if (!sessionStorage.id) 
-    html +=`<a href="index.html" id="btIndex">Inicio</a>
-            <a href="input.html" id="btInput">Ingresar</a>`
+            <nav>
+                <a href="index.html" id="btIndex">Inicio</a>`
+if (!sessionStorage.id)
+    html +=    `<a href="input.html" id="btInput">Ingresar</a>`
 //var id = sessionStorage.getItem('id')
 if (sessionStorage.id)
-    html +=`<a href="dashboard.html" id="btDashboard">Principal</a>
+    html +=`<a href="dashboard.html" id="btDashboard">Artículos</a>
             <a href="exit.html" id="btExit">Salir</a>`            
 html += '</nav>'            
 

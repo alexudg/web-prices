@@ -7,22 +7,22 @@ if (!empty($_GET) and isset($_GET['fn'])) {
             getUserData($_GET['token']);
             break;
         case 'getArticles':
-            getArticles($_GET['txt']);
+            getArticles($_GET['idUser'], $_GET['txt']);
             break;
         case 'isCodeExists':
-            isCodeExists($_GET['code'], $_GET['id']);
+            isCodeExists($_GET['idUser'], $_GET['code'], $_GET['id']);
             break;
         case 'isDescriptionExists':
-            isDescriptionExists($_GET['description'], $_GET['id']);
+            isDescriptionExists($_GET['idUser'], $_GET['description'], $_GET['id']);
             break;
         case 'getArticle':
-            getArticle($_GET['id']);
+            getArticle($_GET['idUser'], $_GET['id']);
             break;
         case 'getFamilies':
-            getFamilies();
+            getFamilies($_GET['idUser'], $_GET['idUser']);
             break;
         case 'isFamilyExists':
-            isFamilyExists($_GET['description'], $_GET['id']);
+            isFamilyExists($_GET['idUser'], $_GET['description'], $_GET['id']);
             break;
     }
     exit();
@@ -33,20 +33,45 @@ else if (!empty($_POST) and isset($_POST['fn'])) {
             isUserExists($_POST['username'], $_POST['pass']);
             break;
         case 'addUpdateArticle':
-            unset($_POST['fn']);
-            addUpdateArticle($_POST);
+            addUpdateArticle($_POST['idUser'], intVal($_POST['id']), $_POST['code'], $_POST['description'], floatval($_POST['price']), $_POST['family']); # idUser, id, code, description, price, family
             break;
         case 'delArticle':
-            delArticle($_POST['id']);
+            delArticle($_GET['idUser'], $_POST['id']);
             break;
         case 'addUpdateFamily':
-            addUpdateFamily($_POST['id'], $_POST['description']);
+            addUpdateFamily($_POST['idUser'], $_POST['id'], $_POST['description']);
             break;
         case 'delFamily':
-            delFamily($_POST['id']);
+            delFamily($_POST['idUser'], $_POST['id']);
             break;
     }
     exit();
+}
+
+function getFileArticles($idUser) {
+    $articlesPath = '../json/articles'.$idUser.'.json';    
+    # si no existe, crearlo vacio
+    if (!file_exists($articlesPath)) 
+        file_put_contents($articlesPath, json_encode(array()));
+    return json_decode(file_get_contents($articlesPath));    
+}
+
+function saveFileArticles($idUser, $articles) {
+    $articlesPath = '../json/articles'.$idUser.'.json';
+    file_put_contents($articlesPath, json_encode($articles, JSON_PRETTY_PRINT));
+}
+
+function getFileFamilies($idUser) {
+    $familiesPath = '../json/families'.$idUser.'.json';    
+    # si no existe, crearlo vacio
+    if (!file_exists($familiesPath)) 
+        file_put_contents($familiesPath, json_encode(array()));
+    return json_decode(file_get_contents($familiesPath));    
+}
+
+function saveFileFamiles($idUser, $families) {
+    $familiesPath = '../json/families'.$idUser.'.json';
+    file_put_contents($familiesPath, json_encode($families, JSON_PRETTY_PRINT));
 }
 
 function isUserExists($username, $pass) {
@@ -97,261 +122,233 @@ function getUserData($token) {
     exit(json_encode($response));    
 }
 
-function isCodeExists($code, $id) {
+function isCodeExists($idUser, $code, $id) {
     $response = array('success' => false, 'description' => null);
-    $articles = json_decode(file_get_contents('../json/articles.json')); # array of objects, inicia con key=0
+    $articles = getFileArticles($idUser);
     $codes = array_column($articles, 'code'); # array of all codes
     $key = array_search($code, $codes); # id<int> | false
     
     # si encontro el objeto con el mismo codigo
     if ($key === 0 or $key > 0) { # estrictamente cero entero ya que false tambien es cero
-        $article = $articles[$key]; # tomar el objeto del articulo que tiene el mismo codigo
         # verificar si el id es diferente, entonces el codigo es de otro articulo
-        if ($article->id != $id)  {
+        if ($articles[$key]->id != $id)  {
             $response['success'] = true;
-            $response['description'] = $article->description;        
+            $response['description'] = $articles[$key]->description;        
         }        
     }
     exit(json_encode($response));
 }
 
-function isDescriptionExists($description, $id) {
+function isDescriptionExists($idUser, $description, $id) {
     $response = array('success' => false);
-    $articles = json_decode(file_get_contents('../json/articles.json')); # array of objects, inicia con key=0
+    $articles = getFileArticles($idUser);
     $description = strtoupper($description); # comparacion en mayusculas
     foreach($articles as $article) {
-        if ($description == strtoupper($article->description)) {
-            if ($id != $article->id) 
-                $response['success'] = true;
-            break;
+        if (strtoupper($article->description) == $description and $article->id != $id) {
+            $response['success'] = true;
+            break;                
         }
     }    
     exit(json_encode($response));
 }
 
-function getFamilyDescription($id) {
+function _getFamilyDescription($idUser, $id) {
     $response = '';
-    $familiesPath = '../json/families.json';
-    if (file_exists($familiesPath)) {
-        $families = json_decode(file_get_contents($familiesPath));
-        $ids = array_column($families, 'id'); # array of id's
-        $key = array_search($id, $ids);
-        if ($key === 0 or $key > 0) 
-            $response = $families[$key]->description;
-    }
+    $families = getFileFamilies($idUser);
+    $ids = array_column($families, 'id'); # array of id's
+    $key = array_search($id, $ids);
+    if ($key === 0 or $key > 0) 
+        $response = $families[$key]->description;    
     return $response;
 }
 
-function addUpdateArticle($article) {
+function addUpdateArticle($idUser, $id, $code, $description, $price, $family) {
     $response = array('success' => false);
-    $articlesPath = '../json/articles.json';
-    if (file_exists($articlesPath)) {
-        $articles = json_decode(file_get_contents($articlesPath));
-        $article['price'] = floatval($article['price']); # string to float    
+    $articles = getFileArticles($idUser);        
 
-        $isContinue = false;
-        # nuevo id para agregar articulo
-        if ($article['id'] == 0) {
-            if (count($articles) > 0)
-                $article['id'] = end($articles)->id + 1; # ultimo elemento sera id mayor
-            else
-                $article['id'] = 1;
-            $article['family'] = getFamilyDescription($article['family']); # family contiene el id   
-            array_push($articles, $article); # agregar nuevo articulo
-            //print_r($articles);
-            $isContinue = true;
-        }
-        # obtener objeto con el mismo id
-        else {
-            $article['id'] = intval($article['id']); # str to int
-            foreach($articles as $value) {
-                # objeto encontrado
-                if ($article['id'] == $value->id) {
-                    //$value = $article;
-                    $value->code = $article['code'];
-                    $value->description = $article['description'];
-                    $value->price = $article['price'];
-                    $value->family = getFamilyDescription($article['family']); # family contiene el id   
-                    break;
-                }
-            }
-            $isContinue = true;
-        }    
-        if ($isContinue) {
-            file_put_contents($articlesPath, json_encode($articles, JSON_PRETTY_PRINT));
-            $response['success'] = true;
-        }
+    $isContinue = false;
+    $family = _getFamilyDescription($idUser, $family); # family_id -> family_description
+    # nuevo id para agregar articulo
+    if ($id == 0) {
+        if (count($articles) > 0)
+            $id = end($articles)->id + 1; # ultimo elemento sera id mayor
+        else
+            $id = 1;        
+        $article = array('id'=>$id, 'code'=>$code, 'description'=>$description, 'price'=>$price, 'family'=>$family);  
+        array_push($articles, $article); # agregar nuevo articulo
+        //print_r($articles);
+        $isContinue = true;
     }
-    exit(json_encode($response));    
-}
-
-function getArticles($txt) {
-    $response = array('success' => false, 'articles' => null);
-    $articlesPath = '../json/articles.json';
-    if (file_exists($articlesPath)) {
-        $articles = json_decode(file_get_contents($articlesPath));
-    
-        # orden ascendente
-        usort($articles, function ($a, $b) {
-            return $a->description > $b->description;
-        });
-
-        if (strlen($txt) > 0) {        
-            $response['articles'] = array();
-            $txt = strtoupper($txt); # comparacion en mayusculas
-            foreach($articles as $article) {
-                # is objet, not array
-                $posCode = strpos($article->code, $txt); # false|<int>
-                $posDescription = strpos(strtoupper($article->description), $txt);
-                $posFamily = strpos(strtoupper($article->family), $txt);
-
-                # estrictamente igual a cero entero, ya que cero es false
-                if ($posCode === 0 or $posCode > 0 or $posDescription === 0 or $posDescription > 0 or $posFamily === 0 or $posFamily > 0) 
-                    array_push($response['articles'], $article);                            
-            }
-            $response['success'] = true;
-        }
-        else {
-            $response['success'] = true;
-            $response['articles'] = $articles;
-        }
-    }    
-    exit(json_encode($response));
-}
-
-function getArticle($id) {
-    $response = array('success' => false, 'article' => null);
-    $articlesPath = '../json/articles.json';
-    if (file_exists($articlesPath)) {
-        $articles = json_decode(file_get_contents($articlesPath));
-        $ids = array_column($articles, 'id'); # array of id's
-        $key = array_search($id, $ids);
-        
-        # estrictamente igual a cero entero ya que tambien es false
-        if ($key === 0 or $key > 0) {
-            $response['success'] = true;
-            $response['article'] = $articles[$key];
-        }
-    }
-    exit(json_encode($response));
-}
-
-function delArticle($id) {
-    $response = array('success' => false);
-    $articlesPath = '../json/articles.json';
-    if (file_exists($articlesPath)) {
-        $articles = json_decode(file_get_contents($articlesPath));
-        $ids = array_column($articles, 'id'); # array de id's 
-        $key = array_search($id, $ids);
-        # estrictamente igual a cero, ya que false es cero tambien
-        if ($key === 0 or $key > 0) { 
-            array_splice($articles, $key, 1); # eliminar desde key, 1 elemento
-            file_put_contents($articlesPath, json_encode($articles, JSON_PRETTY_PRINT));
-            $response['success'] = true;
-        }
-    } 
-    exit(json_encode($response));
-}
-
-function getFamilies() {
-    $response = array('success' => false, 'families' => null);
-    $familiesPath = '../json/families.json';
-    if (file_exists($familiesPath)) {
-        $families = json_decode(file_get_contents($familiesPath));
-        
-        # orden ascendente
-        usort($families, function ($a, $b) {
-            return $a->description > $b->description;
-        });
-
-        $response['success'] = true;
-        $response['families'] = $families;
-    }
-    exit(json_encode($response));
-}
-
-function isFamilyExists($description, $id) {
-    $response = array('success' => false, 'exists' => null);
-    $familiesPath = '../json/families.json';
-    if (file_exists($familiesPath)) {
-        $families = json_decode(file_get_contents($familiesPath));
-        $description = strtoupper($description); # comparacion en mayusculas
-        $response['success'] = true;
-        $response['exists'] = false;
-        foreach ($families as $family) {
-            if (strtoupper($family->description) == $description and $family->id != $id) {
-                $response['exists'] = true;
+    # obtener objeto con el mismo id
+    else {
+        foreach($articles as $article) {
+            # objeto encontrado
+            if ($article->id == $id) {
+                //$article = $article;
+                $article->code = $code;
+                $article->description = $description;
+                $article->price = $price;
+                $article->family = $family;
                 break;
             }
         }
+        $isContinue = true;
+    }    
+    if ($isContinue) {
+        saveFileArticles($idUser, $articles);
+        $response['success'] = true;
     }
-    exit(json_encode($response)); 
+    
+    exit(json_encode($response));    
 }
 
-function addUpdateFamily($id, $description) {
-    $response = array('success' => false);
-    $familiesPath = '../json/families.json';
-    if (file_exists($familiesPath)) {
-        $families = json_decode(file_get_contents($familiesPath));
-        $isContinue = false;
-        # add
-        if ($id == '0') {
-            if (count($families) > 0) 
-                # encontrar el max id + 1
-                $id = end($families)->id + 1; # ultimo objeto del array
-            else 
-                $id = 1;
-            $family = array('id' => $id, 'description' => $description);
-            array_push($families, $family);
-            $isContinue = true;
-        }
-        # update
-        else {
-            $id = intval($id);
-            $ids = array_column($families, 'id'); # array de ids de families
-            $key = array_search($id, $ids); # key del objeto con el mismo id
-            # key estrictamente igual a cero, ya que cero es false
-            if ($key === 0 or $key > 0) {
-                $family = $families[$key];
-                $descriptionOld = $family->description;
-                $family->description = $description;
+function getArticles($idUser, $txt) {
+    $response = array('success' => false, 'articles' => null);        
+    $articles = getFileArticles($idUser); # si no existia se creo uno vacio
 
-                # update article.family with descriptionOld
-                $articlesPath = '../json/articles.json';
-                if (file_exists($articlesPath)) {
-                    $articles = json_decode(file_get_contents($articlesPath));
-                    foreach ($articles as $article) {
-                        if ($article->family == $descriptionOld)
-                            $article->family = $description;
-                    }
-                    file_put_contents($articlesPath, json_encode($articles, JSON_PRETTY_PRINT));
-                }
+    # orden alfabetico ascendente
+    usort($articles, function ($a, $b) {
+        return $a->description > $b->description;
+    });
 
-                $isContinue = true;
-            }
+    if (strlen($txt) > 0) {        
+        $response['articles'] = array();
+        $txt = strtoupper($txt); # comparacion en mayusculas
+        foreach($articles as $article) {
+            # is objet, not array
+            $posCode = strpos($article->code, $txt); # false|<int>
+            $posDescription = strpos(strtoupper($article->description), $txt);
+            $posFamily = strpos(strtoupper($article->family), $txt);
+
+            # estrictamente igual a cero entero, ya que cero es false
+            if ($posCode === 0 or $posCode > 0 or $posDescription === 0 or $posDescription > 0 or $posFamily === 0 or $posFamily > 0) 
+                array_push($response['articles'], $article);                            
         }
-        if ($isContinue) {
-            file_put_contents($familiesPath, json_encode($families, JSON_PRETTY_PRINT));
-            $response['success'] = true;
-        }
+        $response['success'] = true;
     }
+    else {
+        $response['success'] = true;
+        $response['articles'] = $articles;
+    }
+        
     exit(json_encode($response));
 }
 
-function delFamily($id) {
+function getArticle($idUser, $id) {
+    $response = array('success' => false, 'article' => null);
+    $articles = getFileArticles($idUser);
+    $ids = array_column($articles, 'id'); # array of id's
+    $key = array_search($id, $ids);
+    
+    # estrictamente igual a cero entero ya que tambien es false
+    if ($key === 0 or $key > 0) {
+        $response['success'] = true;
+        $response['article'] = $articles[$key];
+    }
+    
+    exit(json_encode($response));
+}
+
+function delArticle($idUser, $id) {
     $response = array('success' => false);
-    $familiesPath = '../json/families.json';
-    if (file_exists($familiesPath)) {
-        $families = json_decode(file_get_contents($familiesPath));
+    $articles = getFileArticles($idUser);
+    $ids = array_column($articles, 'id'); # array de id's 
+    $key = array_search($id, $ids);
+    # estrictamente igual a cero, ya que false es cero tambien
+    if ($key === 0 or $key > 0) { 
+        array_splice($articles, $key, 1); # eliminar desde key, 1 elemento
+        saveFileArticles($idUser, $articles);
+        $response['success'] = true;
+    }
+     
+    exit(json_encode($response));
+}
+
+function getFamilies($idUser) {
+    $response = array('success' => false, 'families' => null);
+    $families = getFileFamilies($idUser); # si no existe se crea uno vacio
+        
+    # orden ascendente
+    usort($families, function ($a, $b) {
+        return $a->description > $b->description;
+    });
+
+    $response['success'] = true;
+    $response['families'] = $families;
+    
+    exit(json_encode($response));
+}
+
+function isFamilyExists($idUser, $description, $id) {
+    $response = array('success' => false, 'exists' => null);
+    $families = getFileFamilies($idUser);
+    $description = strtoupper($description); # comparacion en mayusculas
+    $response['success'] = true;
+    $response['exists'] = false;
+    foreach ($families as $family) {
+        if (strtoupper($family->description) == $description and $family->id != $id) {
+            $response['exists'] = true;
+            break;
+        }
+    }
+    
+    exit(json_encode($response)); 
+}
+
+function addUpdateFamily($idUser, $id, $description) {
+    $response = array('success' => false);
+    $families = getFileFamilies($idUser);
+    $isContinue = false;
+    # add
+    if ($id == '0') {
+        if (count($families) > 0) 
+            # encontrar el max id + 1
+            $id = end($families)->id + 1; # ultimo objeto del array
+        else 
+            $id = 1;
+        $family = array('id' => $id, 'description' => $description);
+        array_push($families, $family);
+        $isContinue = true;
+    }
+    # update
+    else {
+        $id = intval($id);
+        $ids = array_column($families, 'id'); # array de ids de families
+        $key = array_search($id, $ids); # key del objeto con el mismo id
+        # key estrictamente igual a cero, ya que cero es false
+        if ($key === 0 or $key > 0) {
+            $descriptionOld = $families[$key]->description;
+            $families[$key]->description = $description;
+
+            # update article.family with descriptionOld
+            $articles = getFileArticles($idUser);
+            foreach ($articles as $article) {
+                if ($article->family == $descriptionOld)
+                    $article->family = $description;
+            }
+            saveFileArticles($idUser, $articles);
+            $isContinue = true;
+        }
+    }
+    if ($isContinue) {
+        saveFileFamiles($idUser, $families);
+        $response['success'] = true;
+    }
+    
+    exit(json_encode($response));
+}
+
+function delFamily($idUser, $id) {
+    $response = array('success' => false);    
+        $families = getFileFamilies($idUser);
         $ids = array_column($families, 'id'); # array de id's 
         $key = array_search($id, $ids);
         # estrictamente igual a cero, ya que false es cero tambien
         if ($key === 0 or $key > 0) { 
             array_splice($families, $key, 1); # eliminar desde key, 1 elemento
-            file_put_contents($familiesPath, json_encode($families, JSON_PRETTY_PRINT));
+            saveFileFamiles($idUser, $families);
             $response['success'] = true;
-        }
-    } 
+        }     
     exit(json_encode($response));
 }
 

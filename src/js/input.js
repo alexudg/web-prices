@@ -4,24 +4,29 @@ btStatusClose.onclick = () => {
 
 function updateSession(user, isChangeToken=false) {
     console.log('user: ', user)
-    console.log('localStorage.token antes de actualizar: ', localStorage.token)
     console.log('sessionStorage.id antes de actualizar: ', sessionStorage.id)
-    if (isChangeToken)
-        localStorage.setItem('token', user.token)
+    console.log('sessionStorage.username antes de actualizar: ', sessionStorage.username)
+    if (isChangeToken) {
+        console.log('localStorage.token antes de actualizar: ', localStorage.token)
+        localStorage.token = user.token
+        console.log('localStorage.token despues de actualizar: ', localStorage.token)
+    }
+    sessionStorage.clear()
     sessionStorage.id = user.id
     sessionStorage.username = user.username
-    console.log('localStorage.token despues de actualizar: ', localStorage.token)
+    
     console.log('sessionStorage.id despues de actualizar: ', sessionStorage.id)
+    console.log('sessionStorage.username despues de actualizar: ', sessionStorage.username)
+    console.log('re-direccionar')
     window.location.replace('dashboard.html')
 }
 
-async function loadSession() {
+async function getUserData() {
     console.log('token antes del request: ', localStorage.token)
     const response = await executeGet('src/php/db.php?fn=getUserData&token=' + localStorage.token) // {id: <int>}
     console.log('response: ', response)
     if (response.success) {
-        console.log('id dueña de token:', response.user.id)
-        updateSession(response)        
+        updateSession(response.user)        
     }
     // si no existe id asociado al token, elimnar token y que vuelva a inicar sesion
     else {
@@ -41,8 +46,8 @@ form.onsubmit = async (eve) => {
     if (response.success) {
         // save data
         console.log('contraseña correcta, dar de alta token e id')
-        updateSession(response.user, true) 
         showStatus('Bienvenido', false)
+        updateSession(response.user, true) 
     }
     else {
         form.pass.value = ''
@@ -51,16 +56,21 @@ form.onsubmit = async (eve) => {
 }
 
 window.onload = () => {
+    if (sessionStorage.id) 
+        window.location.replace('dashboard.html')
+
     btInput.classList.add('active')    
     // si ya existe token, ir por el usuario a la base de datos
+    form.username.focus()
     console.log('localStorage.token: ', localStorage.token)
-    console.log('sessionStorage.id: ', sessionStorage.id)    
+    console.log('sessionStorage.id: ', sessionStorage.id)  
+    console.log('sessionStorage.username: ', sessionStorage.username) 
     if (localStorage.token) { 
         if (sessionStorage.id) {
             console.log('se encuentra en sesion, redireccionarlo')
-            window.location.replace('dashboard.html')
+            //window.location.replace('dashboard.html')
         }
         else
-            loadSession();
+            getUserData();
     }
 }

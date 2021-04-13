@@ -1,49 +1,61 @@
-.table-portrait {
-    background-color: lightsteelblue;
-    padding: 10px;
-    border-radius: 5px;
-    box-shadow: 0 0 6px black;
-}
-
-/* button close families */
-.table-portrait > button {
-    display: block;
-    margin: 5px auto;
-    width: 80px;
-    height: 35px;
-    border: none;
-    border-radius: 5px;
-}
-
 table {
-    border: 0.5px solid gray;
-    min-width: 300px;
-    border-collapse: separate;
+    border: 0.5px solid silver;
+    display: block;
+    border-collapse: collapse;
+    min-width: 320px;
+    margin: 10px 0;
+    padding: 5px;
     font-size: 14pt;
-    border-radius: 5px;
+    border-radius: 5px; 
+    overflow-x: auto; 
+    white-space: nowrap; /* no estrechar al encojer anchura */ 
 }
 
-table > thead input[type=search] {
-    height: 35px;
-    border: 0.5 solid silver;
-    border-radius: 5px;   
+table > caption {
+    border: 0.5px solid silver;
+    border-radius: 5px;
+    height: 45px;
+    position: relative;
+}
+
+table input[type=search] {
+    /* border: 1px solid; */
+    background-color: whitesmoke;
+    width: 120px;
+    height: 25px;
+    padding: 5px;
+    border: none;
+    border-radius: 5px; 
+    position: absolute; 
+    left: 5px; 
+    top: 10px;
+}
+
+table > caption > span {
+    font-size: 16pt;
+    position: absolute;
+    left: 150px;
+    top: 10px;
 }
 
 table button {    
     width: 40px;
     height: 35px;
+    padding-top: 3px; /* img center */
     border: none;
     border-radius: 5px;
+    box-shadow: 0 0 3px black;
 }
 
-table thead button,
-table caption button {
-    background-color: lightgreen;
-    width: 80px;
-    margin-left: 100px;
-    margin-bottom: 5px;
-    font-size: 12pt;
-    box-shadow: 0 0 3px gray;
+table > caption > button {
+    background-color: lightgreen; 
+    position: absolute;
+    top: 5px;
+    right: 5px;   
+}
+
+table th {
+    text-align: left;
 }
 
 table button:hover {
@@ -54,9 +66,12 @@ table button:hover {
     text-align: right;
 }
 
-td {
-    border-top: 0.5px solid silver;
-    padding: 0 3px;
+table > tbody > tr {
+    border: 0.5px solid silver;     
+}
+
+th, td {
+    padding: 3px 10px;
 }
 
 .bt-edit {
@@ -67,14 +82,10 @@ td {
     background-color: salmon;
 }
 
-table > tfoot > tr {
-    margin-top: 10px;
-}
-
 table > tfoot td {
+    border: 0.5px solid silver;
     background-color: gainsboro;
     text-align: center;
     padding: 5px 0;
     border-radius: 3px;
-    box-shadow: 0 0 3px black;
 }

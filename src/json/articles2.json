@@ -1,0 +1,23 @@
+[
+    {
+        "id": 1,
+        "code": "001",
+        "description": "articulo uno de user",
+        "price": 10.1,
+        "family": "familia uno de user"
+    },
+    {
+        "id": 2,
+        "code": "002",
+        "description": "articulo dos de user",
+        "price": 20.2,
+        "family": "familia dos de user"
+    },
+    {
+        "id": 3,
+        "code": "003",
+        "description": "articulo tres de user",
+        "price": 30.3,
+        "family": "familia tres de user"
+    }
+]

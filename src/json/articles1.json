@@ -1,0 +1,23 @@
+[
+    {
+        "id": 1,
+        "code": "01",
+        "description": "articulo uno de admin",
+        "price": 11.1,
+        "family": "familia uno de admin"
+    },
+    {
+        "id": 2,
+        "code": "02",
+        "description": "articulo dos de admin",
+        "price": 22.2,
+        "family": "familia dos de admin"
+    },
+    {
+        "id": 3,
+        "code": "03",
+        "description": "articulo tres de admin",
+        "price": 50,
+        "family": "familia tres de admin"
+    }
+]

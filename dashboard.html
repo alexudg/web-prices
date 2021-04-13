@@ -5,8 +5,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="src/css/style.css">
-    <link rel="stylesheet" href="src/css/table.css">
     <link rel="stylesheet" href="src/css/modal.css">
+    <link rel="stylesheet" href="src/css/table.css">
     <link rel="shortcut icon" href="src/img/favicon32px.png" type="image/png">
     <title>Checador de precios</title>
 </head>
@@ -14,19 +14,18 @@
     <header></header>
     <main>
         <table>            
-            <caption>Articulos</caption>
-            <thead>
-                <tr>
-                    <td colspan="2">
-                        <input type="search" id="searchArticle" placeholder="buscar..." onchange="loadArticles()" on>
-                        <button onclick="addArticle()">Agregar</button>                        
-                    </td>
-                </tr>
+            <caption>
+                <input type="search" id="searchArticle" placeholder="buscar..." onchange="loadArticles()" on>
+                <span>Artículos</span> 
+                <button onclick="addArticle()"><img src="src/img/add24px.png"></button> 
+            </caption>
+            <thead>                
                 <tr>
                     <th>Código</th>
                     <th>Artículo</th>
                     <th>Precio</th>
                     <th>Familia</th>
+                    <th>Acciones</th>
                 </tr>
             </thead>
             <tbody id="tbody">
@@ -108,7 +107,7 @@
             <div class="form">
                 <h4>Eliminar familia</h4>
                 <input type="hidden" id="idFamilyDel">
-                <p>¿Estás segur@ de eliminar la familia...</p>
+                <p>¿Estás segur@ de eliminar familia...?</p>
                 <h4 id="descriptionFamilyDel"></h4>
                 <div class="form__buttons">
                     <button id="btOkFamilyDel">Eliminar</button>
