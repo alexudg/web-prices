@@ -19,5 +19,19 @@
         "description": "articulo tres de user",
         "price": 30.3,
         "family": "familia tres de user"
+    },
+    {
+        "id": 4,
+        "code": "004",
+        "description": "articulo cuatro de user",
+        "price": 4.4,
+        "family": "familia cuatro de user"
+    },
+    {
+        "id": 5,
+        "code": "005",
+        "description": "articulo cinco de user",
+        "price": 55.5,
+        "family": "familia cinco de user"
     }
 ]

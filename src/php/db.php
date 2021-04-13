@@ -36,7 +36,7 @@ else if (!empty($_POST) and isset($_POST['fn'])) {
             addUpdateArticle($_POST['idUser'], intVal($_POST['id']), $_POST['code'], $_POST['description'], floatval($_POST['price']), $_POST['family']); # idUser, id, code, description, price, family
             break;
         case 'delArticle':
-            delArticle($_GET['idUser'], $_POST['id']);
+            delArticle($_POST['idUser'], $_POST['id']);
             break;
         case 'addUpdateFamily':
             addUpdateFamily($_POST['idUser'], $_POST['id'], $_POST['description']);
@@ -44,8 +44,26 @@ else if (!empty($_POST) and isset($_POST['fn'])) {
         case 'delFamily':
             delFamily($_POST['idUser'], $_POST['id']);
             break;
+        case 'getUsers':
+            getUsers($_POST['idUser']);
+            break;
     }
     exit();
+}
+
+function getFileUsers() {
+    $usersPath = '../json/users.json';    
+    # si no existe, crear usuario default admin:1
+    if (!file_exists($usersPath)) { 
+        $user = array('id'=>1, 'email'=>'puntoplanet@gmail.com', 'username'=>'admin', 'pass'=>'$2y$10$MDggBLqURRhbvdY4WM52me06PmsZe5AHY06rFknDLTrjD77RK3Vcq');
+        file_put_contents($usersPath, json_encode(array($user)));
+    }
+    return json_decode(file_get_contents($usersPath));    
+}
+
+function saveFileUsers($users) {
+    $usersPath = '../json/users.json';
+    file_put_contents($usersPath, json_encode($users, JSON_PRETTY_PRINT));
 }
 
 function getFileArticles($idUser) {
@@ -76,50 +94,69 @@ function saveFileFamiles($idUser, $families) {
 
 function isUserExists($username, $pass) {
     $response = array('success' => false, 'user' => null);
-    $usersPath = '../json/users.json';
-    if (file_exists($usersPath)) {
-        $users = json_decode(file_get_contents($usersPath));
-        $users_username = array_column($users, 'username'); # array de todos los username
-        $key = array_search($username, $users_username); # <int>|false
-        
-        # key=false puede pasar x cero, comparacion estricta
-        if ($key === 0 or $key > 0) { 
-            # obtener contraseña encriptada
-            $hash = $users[$key]->pass;
-            # verificar contraseña
-            if (password_verify($pass, $hash)) {
-                # generar token
-                $token = '';
-                for ($i=0; $i < 8; $i++)
-                    $token .= dechex(rand(0, 15));
-                $users[$key]->token = $token; # save token in user register   
-                $response['success'] = true;
-                $response['user']['id'] = $users[$key]->id;
-                $response['user']['username'] = $users[$key]->username;
-                $response['user']['token'] = $token;
-                file_put_contents($usersPath, json_encode($users, JSON_PRETTY_PRINT));
-            }
-        }    
+    
+    $users = getFileUsers();
+    $usernames = array_column($users, 'username'); # array de todos los username
+    $key = array_search($username, $usernames); # <int>|false
+    
+    # key=false puede pasar x cero, comparacion estricta
+    if ($key === 0 or $key > 0) { 
+        # obtener contraseña encriptada
+        $hash = $users[$key]->pass;
+        # verificar contraseña
+        if (password_verify($pass, $hash)) {
+            # generar token
+            $token = '';
+            for ($i=0; $i < 8; $i++)
+                $token .= dechex(rand(0, 15));
+            $users[$key]->token = $token; # save token in user register   
+            $response['success'] = true;
+            $response['user']['id'] = $users[$key]->id;
+            $response['user']['username'] = $users[$key]->username;
+            $response['user']['token'] = $token;            
+        }
     }
     exit(json_encode($response));
 }
 
 function getUserData($token) {
-    $response = array('success' => false, 'user' => null);
-    $usersPath = '../json/users.json';
-    if (file_exists($usersPath)) {
-        $users = json_decode(file_get_contents($usersPath));
-        $users_token = array_column($users, 'token'); # array de todos los username
-        $key = array_search($token, $users_token); # <int>|false
-        
-        # key=false puede pasar x cero, comparacion estricta
-        if ($key === 0 or $key > 0) { 
-            $response['success'] = true;
-            $response['user']['id'] = $users[$key]->id;
-            $response['user']['username'] = $users[$key]->username;
+    $response = array('success' => false, 'user' => null);    
+    $users = getFileUsers();
+    $tokens = array_column($users, 'token'); # array de todos los username
+    $key = array_search($token, $tokens); # <int>|false
+    
+    # key=false puede pasar x cero, comparacion estricta
+    if ($key === 0 or $key > 0) { 
+        $response['success'] = true;
+        $response['user']['id'] = $users[$key]->id;
+        $response['user']['username'] = $users[$key]->username;
+    }    
+    exit(json_encode($response));    
+}
+
+function getUsers($idUser) {
+    $response = array('success'=>false, 'users'=>null);
+    $users = getFileUsers();
+
+    # orden alfabetico ascendente
+    usort($users, function ($a, $b) {
+        return $a->username > $b->username;
+    });
+
+    $usersSend = array(); # usuarios a ser enviados
+    foreach ($users as $key=>$user) {
+        # super-adimin o mismo usuario que lo solicita
+        if ($idUser == 1 or $user->id == $idUser) {
+            $userSend = array('id'=>$user->id, 'username'=>$user->username); # 
+            array_push($usersSend, $userSend); # add new user created 
+            if ($idUser != 1)
+                break;
         }
     }
-    exit(json_encode($response));    
+    $response['success'] = true;
+    $response['users'] = $usersSend;    
+
+    exit(json_encode($response));
 }
 
 function isCodeExists($idUser, $code, $id) {

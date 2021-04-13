@@ -17,7 +17,21 @@
         "id": 3,
         "code": "03",
         "description": "articulo tres de admin",
-        "price": 50,
+        "price": 33.3,
         "family": "familia tres de admin"
+    },
+    {
+        "id": 4,
+        "code": "05",
+        "description": "articulo cinco de admin",
+        "price": 55.5,
+        "family": "familia cinco de admin"
+    },
+    {
+        "id": 5,
+        "code": "04",
+        "description": "articulo cuatro de admin",
+        "price": 44.4,
+        "family": "familia cuatro de admin"
     }
 ]

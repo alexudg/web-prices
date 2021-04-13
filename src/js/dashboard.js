@@ -1,4 +1,5 @@
-let txt = ''
+let searchText = ''
+let idUserSelected = sessionStorage.id
 
 function addArticle() {
     formTitle.innerText = 'Agregar artículo'
@@ -10,7 +11,7 @@ function addArticle() {
 
 async function editArticle(id) {
     // solicitud de datos del articulo
-    const response = await executeGet('src/php/db.php?fn=getArticle&idUser=' + sessionStorage.id + '&id=' + id)
+    const response = await executeGet('src/php/db.php?fn=getArticle&idUser=' + idUserSelected + '&id=' + id)
     //console.log(response) // {success: false|true, article: null|{}}
     if (response.success) {
         formTitle.innerText = 'Modificar artículo'
@@ -42,11 +43,45 @@ function delArticle(id, description) {
     modalDel.style.display = 'flex'
 }
 
+// security by post
+async function loadUsersSelect() {
+    let formData = new FormData()
+    formData.append('fn', 'getUsers')
+    formData.append('idUser', idUserSelected)
+    const response = await executePost('src/php/db.php', formData)
+    //console.log(response) // { success: false|true, users: null | [{}] | [{},{},...] }
+
+    // fill select
+    selUsers.innerHTML = ''
+    response.users.forEach(user => {
+        //console.log(user)
+        selUsers.innerHTML +=  `<option value="${user.id}">${user.username}</option>`        
+    })
+    // if super-admin, select admin
+    if (sessionStorage.id == '1') {
+        for (const option of selUsers.options) {
+            if (option.value == '1') {
+                selUsers.selectedIndex = option.index
+                break;
+            }
+        }
+    }    
+    else
+        selUsers.style.visibility = 'hidden'    
+}
+
+function selUsersChange() {
+    //console.log('selUserChange')
+    idUserSelected = selUsers.options[selUsers.selectedIndex].value
+    searchArticle.value = searchText == '' ? '*' : searchText
+    loadArticles()
+}
+
 async function loadArticles() {
-    txt = (searchArticle.value.trim())
-    if (txt == '*')
-        txt = ''
-    const response = await executeGet('src/php/db.php?fn=getArticles&idUser=' + sessionStorage.id + '&txt=' + txt) // script.js
+    searchText = (searchArticle.value.trim())
+    if (searchText == '*')
+        searchText = ''
+    const response = await executeGet('src/php/db.php?fn=getArticles&idUser=' + idUserSelected + '&txt=' + searchText) // script.js
     //console.log('getArticles: ', response) // {success: true | false, articles: [] | [{},{},...] | null}
     tbody.innerHTML = ''
     if (response.success) {
@@ -112,7 +147,7 @@ function closeModalAddEditFamily() {
 
 async function loadSelectFamilies() {
     // cargar familias en el combo
-    const response = await executeGet('src/php/db.php?fn=getFamilies&idUser=' + sessionStorage.id)
+    const response = await executeGet('src/php/db.php?fn=getFamilies&idUser=' + idUserSelected)
     //console.log(response) // {success: false|true, families: null|[{},{}]}
     if (response.success) {
         const visibility =  response.families.length > 0 ? 'visible' : 'hidden'
@@ -131,19 +166,22 @@ btCancel.onclick = () => {
 
 btOkDel.onclick = async () => {
     //console.log('btOkDel')
+    divDelArticle.style.display = 'none'
     formData = new FormData
     formData.append('fn', 'delArticle')
-    formData.append('idUser', sessionStorage.id)
+    formData.append('idUser',idUserSelected)
     formData.append('id', idToDel.value)
     const response = await executePost('src/php/db.php', formData) // script.js
     //console.log(response)
+    //return
     if (response.success) {
         showStatusDel('El artículo ha sido eliminado.', false) // form.js
         setTimeout(() => {
             modalDel.click() // se genera el param 'eve'
-            searchArticle.value = txt == '' ? '*' : txt 
+            divDelArticle.style.display = 'block'
+            searchArticle.value = searchText == '' ? '*' : searchText 
             loadArticles()
-        }, 2500)
+        }, 2000)
     }
     else 
         showStatusDel() // form.js 
@@ -157,9 +195,10 @@ btCancelDel.onclick = () => {
 // confirm del family
 btOkFamilyDel.onclick = async () => {
     //console.log('btOkDel')
-    formData = new FormData
+    divDelFamily.style.display = 'none'
+    formData = new FormData()
     formData.append('fn', 'delFamily')
-    formData.append('idUser', sessionStorage.id)
+    formData.append('idUser', idUserSelected)
     formData.append('id', idFamilyDel.value)
     const response = await executePost('src/php/db.php', formData) // script.js
     //console.log(response)
@@ -168,8 +207,9 @@ btOkFamilyDel.onclick = async () => {
         loadSelectFamilies() // reload families into combo
         setTimeout(() => {
             // cerrar modal
-            modalFamilyDel.click() // se genera el param 'eve'            
-        }, 2500)
+            modalFamilyDel.click() // se genera el param 'eve'
+            divDelFamily.style.display = 'block'            
+        }, 2000)
     }
     else 
         showStatusFamilyDel() // form.js 
@@ -236,13 +276,14 @@ formFamily.onsubmit = async (eve) => {
     
     // verificar si ya existe la family
     const description = formFamily.description.value.trim()
-    const response = await executeGet('src/php/db.php?fn=isFamilyExists&idUser=' + sessionStorage.id + '&description=' + description + '&id=' + formFamily.id.value)
+    const response = await executeGet('src/php/db.php?fn=isFamilyExists&idUser=' + idUserSelected + '&description=' + description + '&id=' + formFamily.id.value)
     //console.log(response) // {success: false|true, exists: null|false|true}
     if (response.success) {
         if (!response.exists) {
+            formFamily.style.display = 'none'
             let formData = new FormData()
             formData.append('fn', 'addUpdateFamily')
-            formData.append('idUser', sessionStorage.id)
+            formData.append('idUser', idUserSelected)
             formData.append('id', formFamily.id.value) // id=0 add, id>0 edit
             formData.append('description', description)
             const response = await executePost('src/php/db.php', formData)
@@ -289,7 +330,8 @@ formFamily.onsubmit = async (eve) => {
                 
                 setTimeout(() => {
                     modalAddEditFamily.click() // cerrar form addEdit family
-                }, 2500)
+                    formFamily.style.display = 'block'
+                }, 2000)
             }
             // error en post
             else
@@ -311,7 +353,7 @@ form.onsubmit = async (eve) => {
     let value = form.code.value.trim()
     //console.log(code) 
     if (value.length > 0) {
-        let response = await executeGet('src/php/db.php?fn=isCodeExists&idUser=' + sessionStorage.id + '&code=' + value + '&id=' + form.id.value) // id=0 para no encontrar ningun id igual
+        let response = await executeGet('src/php/db.php?fn=isCodeExists&idUser=' + idUserSelected + '&code=' + value + '&id=' + form.id.value) // id=0 para no encontrar ningun id igual
         // codigo ya existe
         if (response.success) 
             showStatus('El código ya existe para...<br><b>' + response.description + '</b>.') // form.js
@@ -326,7 +368,7 @@ form.onsubmit = async (eve) => {
         isContinue = false
         value = form.description.value.trim()
         //console.log(value)
-        response = await executeGet('src/php/db.php?fn=isDescriptionExists&idUser=' + sessionStorage.id + '&description=' + value + '&id=' + form.id.value) // id=0 para no encontrar ningun id igual
+        response = await executeGet('src/php/db.php?fn=isDescriptionExists&idUser=' + idUserSelected + '&description=' + value + '&id=' + form.id.value) // id=0 para no encontrar ningun id igual
         //console.log(response)
         // codigo ya existe
         if (response.success) 
@@ -337,9 +379,10 @@ form.onsubmit = async (eve) => {
 
     // descripcion no existe o es del mismo articulo a modificar
     if (isContinue) {
+        form.style.display = 'none'
         let formData = new FormData(form)
         formData.append('fn', 'addUpdateArticle')
-        formData.append('idUser', sessionStorage.id)
+        formData.append('idUser', idUserSelected)
         response = await executePost('src/php/db.php', formData) // script.js
         //console.log(response) // {success: true}
         if (response.success) {
@@ -349,10 +392,11 @@ form.onsubmit = async (eve) => {
             showStatus(statusTxt, false)
             setTimeout(() => {
                 btCancel.click()
+                form.style.display = 'block'
                 // load articles
-                searchArticle.value = txt == '' ? '*' : txt
+                searchArticle.value = searchText == '' ? '*' : searchText
                 loadArticles()
-            }, 2500)                   
+            }, 2000)                   
         }
     }
 }
@@ -369,5 +413,7 @@ window.onload = async () => {
     btDashboard.classList.add('active')
     searchArticle.focus()
     // searchArticle.value = '*'
-    // loadArticles()    
+    // loadArticles()  
+    await loadUsersSelect() 
+    idUserSelected = selUsers.options[selUsers.selectedIndex].value 
 } 

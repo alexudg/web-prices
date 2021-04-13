@@ -38,6 +38,14 @@ table > caption > span {
     top: 10px;
 }
 
+table > caption > select {
+    width: 100px;
+    height: 25px;
+    position: absolute;
+    top: 10px;
+    right: 50px;
+}
+
 table button {    
     width: 40px;
     height: 35px;
