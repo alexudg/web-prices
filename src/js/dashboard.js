@@ -88,9 +88,9 @@ async function loadArticles() {
         response.articles.forEach(article => {
             //console.log(article)
             tbody.innerHTML += `<tr>
-                                    <td>${article.code}</td>
                                     <td>${article.description}</td>
                                     <td class="price">$${article.price.toFixed(2)}</td>
+                                    <td>${article.code}</td>
                                     <td>${article.family}</td>
                                     <td>
                                         <button class="bt-edit" onclick="editArticle(${article.id})"><img src="src/img/edit24px.png" alt="Editar" title="Editar"></button>

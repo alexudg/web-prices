@@ -31,10 +31,17 @@ table input[type=search] {
     top: 10px;
 }
 
+table > caption > button {
+    background-color: lightgreen; 
+    position: absolute;
+    left: 130px;   
+    top: 5px;
+}
+
 table > caption > span {
     font-size: 16pt;
     position: absolute;
-    left: 150px;
+    left: 180px;
     top: 10px;
 }
 
@@ -43,7 +50,7 @@ table > caption > select {
     height: 25px;
     position: absolute;
     top: 10px;
-    right: 50px;
+    right: 5px;
 }
 
 table button {    
@@ -53,13 +60,6 @@ table button {
     border: none;
     border-radius: 5px;
     box-shadow: 0 0 3px black;
-}
-
-table > caption > button {
-    background-color: lightgreen; 
-    position: absolute;
-    top: 5px;
-    right: 5px;   
 }
 
 table th {
