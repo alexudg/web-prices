@@ -3,14 +3,14 @@
         "id": 1,
         "email": "alexudg@gmail.com",
         "username": "admin",
-        "pass": "$2y$10$MDggBLqURRhbvdY4WM52me06PmsZe5AHY06rFknDLTrjD77RK3Vcq",
-        "token": "21d51aad"
+        "pass": "$2y$10$oCm8B284banGegQFKpU6tO.959K3TdDzlByJzl\/gtUU9Afh87asYS",
+        "token": "aa5ce06e"
     },
     {
         "id": 2,
         "email": "puntoplanet@gmail.com",
         "username": "user",
         "pass": "$2y$10$MDggBLqURRhbvdY4WM52me06PmsZe5AHY06rFknDLTrjD77RK3Vcq",
-        "token": "ab755f69"
+        "token": "24a57a10"
     }
 ]

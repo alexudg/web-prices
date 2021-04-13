@@ -47,6 +47,12 @@ else if (!empty($_POST) and isset($_POST['fn'])) {
         case 'getUsers':
             getUsers($_POST['idUser']);
             break;
+        case 'isUserPass':
+            isUserPass($_POST['id'], $_POST['pass']);
+            break;
+        case 'updateUserData':
+            updateUserData(); # se utiliza $_POST
+            break;
     }
     exit();
 }
@@ -101,10 +107,8 @@ function isUserExists($username, $pass) {
     
     # key=false puede pasar x cero, comparacion estricta
     if ($key === 0 or $key > 0) { 
-        # obtener contraseña encriptada
-        $hash = $users[$key]->pass;
         # verificar contraseña
-        if (password_verify($pass, $hash)) {
+        if (password_verify($pass, $users[$key]->pass)) {
             # generar token
             $token = '';
             for ($i=0; $i < 8; $i++)
@@ -113,10 +117,24 @@ function isUserExists($username, $pass) {
             $response['success'] = true;
             $response['user']['id'] = $users[$key]->id;
             $response['user']['username'] = $users[$key]->username;
+            $response['user']['email'] = $users[$key]->email;
             $response['user']['token'] = $token;
             # save file with new token
             saveFileUsers($users);            
         }
+    }
+    exit(json_encode($response));
+}
+
+function isUserPass($id, $pass) {
+    $response = array('success'=>false);
+    $users = getFileUsers();
+    $ids = array_column($users, 'id'); # array of id's
+    $key = array_search($id, $ids); # false|<int>
+    # comparacion estricta a cero integer, ya que false=0 tambien
+    if ($key === 0 or $key > 0) {
+        if (password_verify($pass, $users[$key]->pass))
+            $response['success'] = true;
     }
     exit(json_encode($response));
 }
@@ -132,6 +150,7 @@ function getUserData($token) {
         $response['success'] = true;
         $response['user']['id'] = $users[$key]->id;
         $response['user']['username'] = $users[$key]->username;
+        $response['user']['email'] = $users[$key]->email;
     }    
     exit(json_encode($response));    
 }
@@ -158,6 +177,26 @@ function getUsers($idUser) {
     $response['success'] = true;
     $response['users'] = $usersSend;    
 
+    exit(json_encode($response));
+}
+
+function updateUserData() {
+    $response = array('success'=>false);
+    $users = getFileUsers();
+    $ids = array_column($users, 'id'); # array of id's
+    $key = array_search($_POST['id'], $ids);
+    # key debe ser esctrictamente entero
+    if ($key === 0 or $key > 0) {
+        $users[$key]->username = $_POST['username'];
+        $users[$key]->email = $_POST['email'];
+        if ($_POST['pass'] !== '') {
+            # encriptar pass
+            $_POST['pass'] = password_hash($_POST['pass'], PASSWORD_BCRYPT);
+            $users[$key]->pass = $_POST['pass'];
+        }
+        saveFileUsers($users);
+        $response['success'] = true;
+    }
     exit(json_encode($response));
 }
 

@@ -405,8 +405,7 @@ window.onload = async () => {
     if (!sessionStorage.id)
         window.location.replace('input.html')
     console.log('localStorage.token:', localStorage.token)
-    console.log('sessionStorage.id: ', sessionStorage.id) 
-    console.log('sessionStorage.username: ', sessionStorage.username)
+    console.log('sessionStorage: ', sessionStorage) 
     if (!sessionStorage.id) {
         window.location.href = 'input.html'
     }

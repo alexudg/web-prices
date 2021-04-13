@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es-ES">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="src/css/style.css">
+    <link rel="stylesheet" href="src/css/form.css">
+    <link rel="shortcut icon" href="src/img/favicon32px.png" type="image/png">
+    <title>Checador de precios</title>
+</head>
+<body>
+    <header></header>
+    <main>
+        <div class="form">
+            <h4>Mis datos</h4>
+            <section id="sectionForm">
+                <form class="form__form" id="form">                
+                    <input type="text" name="username" placeholder="*Usuario" required>
+                    <input type="email" name="email" placeholder="*Correo" required>
+                    <input type="checkbox" name="ckPass" id="ckPass" onchange="ckPassChange(this.checked)">
+                    <label for="ckPass">Cambiar contraseña</label>
+                    <section id="sectionPass" class="form__section-pass">
+                        <input type="password" name="passOld" placeholder="*Contraseña actual"> <!-- init hidden, no required -->
+                        <input type="password" name="pass" placeholder="*Nueva Contraseña">
+                        <input type="password" name="confirm" placeholder="*Confirmar nueva contraseña">
+                    </section>
+                    <h5>*Campos obligatorios</h5>
+                    <div class="form__buttons">
+                        <button id="btOk">Guardar</button>
+                        <button onclick="btCancelClick()">Cancelar</button>
+                    </div>
+                </form>
+            </section>
+            <div class="form__status" id="statusArea">
+                <span class="form__status-close" id="btStatusClose" onclick="btStatusCloseClick()">x</span>
+                <p class="form__status-text" id="statusText">Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatem debitis impedit voluptas adipisci neque, assumenda cum porro repudiandae in provident sit consectetur hic laboriosam tempore tempora dignissimos expedita autem inventore!</p>
+            </div>            
+        </div>
+    </main>
+    <footer></footer>
+    <script src="src/js/script.js"></script> <!-- header, footer, get, post -->
+    <script src="src/js/form.js"></script> <!-- showStatus -->
+    <script src="src/js/mydata.js"></script>
+</body>
+</html>

@@ -33,14 +33,16 @@ async function executePost(url, data, isText=false) {
     return echo
 }
 
-let html = `<img src="src/img/logo300x243px.png" alt="">
+let html = `<img src="src/img/logo300x185px.png" alt="">
+            <h2>Checador de precios</h2>
             <nav>
                 <a href="index.html" id="btIndex">Inicio</a>`
 if (!sessionStorage.id)
     html +=    `<a href="input.html" id="btInput">Ingresar</a>`
 //var id = sessionStorage.getItem('id')
 if (sessionStorage.id)
-    html +=`<a href="dashboard.html" id="btDashboard">Artículos</a>
+    html +=`<a href="dashboard.html" id="btDashboard">Precios</a>
+            <a href="mydata.html" id="btMyData">Mis datos</a>
             <a href="exit.html" id="btExit">Salir</a>`            
 html += '</nav>'            
 

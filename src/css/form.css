@@ -11,7 +11,7 @@
     margin: 8px 0;
 }
 
-.form__form > input:not([type=search]),
+.form__form input:not([type=search]):not([type=checkbox]),
 .form__families > select {
     border: none;
     width: 100%;
@@ -70,6 +70,18 @@
 
 .form__families__buttons > button:nth-child(3) {
     background-color: salmon;
+}
+
+.form__form input[type=checkbox] {
+    margin: 5px;
+}
+
+.form__form label {
+    display: inline;
+}
+
+.form__section-pass {
+    display: none;
 }
 
 .form__form input[type=submit],
