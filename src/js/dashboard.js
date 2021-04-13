@@ -73,13 +73,13 @@ async function loadUsersSelect() {
 function selUsersChange() {
     //console.log('selUserChange')
     idUserSelected = selUsers.options[selUsers.selectedIndex].value
-    searchArticle.value = searchText == '' ? '*' : searchText
+    searchArticle.value = searchText == '' ? '.' : searchText
     loadArticles()
 }
 
 async function loadArticles() {
     searchText = (searchArticle.value.trim())
-    if (searchText == '*')
+    if (searchText == '.')
         searchText = ''
     const response = await executeGet('src/php/db.php?fn=getArticles&idUser=' + idUserSelected + '&txt=' + searchText) // script.js
     //console.log('getArticles: ', response) // {success: true | false, articles: [] | [{},{},...] | null}
@@ -179,7 +179,7 @@ btOkDel.onclick = async () => {
         setTimeout(() => {
             modalDel.click() // se genera el param 'eve'
             divDelArticle.style.display = 'block'
-            searchArticle.value = searchText == '' ? '*' : searchText 
+            searchArticle.value = searchText == '' ? '.' : searchText 
             loadArticles()
         }, 2000)
     }
@@ -394,7 +394,7 @@ form.onsubmit = async (eve) => {
                 btCancel.click()
                 form.style.display = 'block'
                 // load articles
-                searchArticle.value = searchText == '' ? '*' : searchText
+                searchArticle.value = searchText == '' ? '.' : searchText
                 loadArticles()
             }, 2000)                   
         }
