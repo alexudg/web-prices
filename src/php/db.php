@@ -113,7 +113,9 @@ function isUserExists($username, $pass) {
             $response['success'] = true;
             $response['user']['id'] = $users[$key]->id;
             $response['user']['username'] = $users[$key]->username;
-            $response['user']['token'] = $token;            
+            $response['user']['token'] = $token;
+            # save file with new token
+            saveFileUsers($users);            
         }
     }
     exit(json_encode($response));
