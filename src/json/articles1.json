@@ -3,7 +3,7 @@
         "id": 1,
         "code": "01",
         "description": "articulo uno de admin",
-        "price": 11.1,
+        "price": 11.11,
         "family": "familia uno de admin"
     },
     {
@@ -36,9 +36,9 @@
     },
     {
         "id": 6,
-        "code": "",
-        "description": "fsdf",
-        "price": 0.5,
-        "family": "familia cinco de admin"
+        "code": "06",
+        "description": "articulo seis de admin",
+        "price": 66.6,
+        "family": "familia seis de admin"
     }
 ]

@@ -12,6 +12,7 @@ if (sessionStorage.id)
                     <li><a href="mydata.html" id="btMyDataList">Mis datos</a></li>`
 if (sessionStorage.id == '1') // super-admin
     html +=        `<li><a href="users.html" id="btUsersList">Usuarios</a></li>`
+if (sessionStorage.id)
     html +=        `<li><a href="exit.html" id="btExitList">Salir</a></li>`
     html +=    `</ul>
             </aside>`
@@ -21,27 +22,26 @@ menuHidden.innerHTML = html
 menuHidden.onclick = (eve) => {
     if (eve.target == menuHidden) {
         menuHidden.style.display = 'none'
-        menuHidden.firstChild.style.width = '0px'
+        menuHidden.firstChild.style.marginRight = '-160px'        
     }
 }
 
 // header
 html = `<img src="src/img/logo300x185px.png" alt="Logotipo">
-            <span>Checador de precios</span>
-            <nav class="navMain">
-                <a href="index.html" id="btIndex">Inicio</a>`
+        <span>Checador de precios</span>
+        <nav class="navMain">
+            <a href="index.html" id="btIndex">Inicio</a>`
 if (!sessionStorage.id)
-    html +=    `<a href="input.html" id="btInput">Ingresar</a>`
+    html +=`<a href="input.html" id="btInput">Ingresar</a>`
 //var id = sessionStorage.getItem('id')
 if (sessionStorage.id)
-    html +=    `<a href="dashboard.html" id="btDashboard">Precios</a>
-                <a href="mydata.html" id="btMyData">Mis datos</a>`
+    html +=`<a href="dashboard.html" id="btDashboard">Precios</a><a href="mydata.html" id="btMyData">Mis datos</a>` // en linea porque genera espacio si se pasa al sig renglon
 if (sessionStorage.id == '1') // super-admin
-    html +=    `<a href="users.html" id="btUsers">Usuarios</a>`
+    html +=`<a href="users.html" id="btUsers">Usuarios</a>`
 if (sessionStorage.id)
-    html +=    `<a href="exit.html" id="btExit">Salir</a>`            
-html +=    `</nav>
-            <img class="btmenu" src="src/img/menu32px.png" onclick="menuOpen()">`           
+    html +=`<a href="exit.html" id="btExit">Salir</a>`            
+html +=`</nav>
+        <img class="btmenu" src="src/img/menu32px.png" onclick="menuOpen()">`           
 
 document.getElementsByTagName('header')[0].innerHTML = html
 
@@ -86,11 +86,11 @@ async function executePost(url, data, isText=false) {
 function menuClose() {
     //console.log(menuHidden)
     menuHidden.style.display = 'none'
-    menuHidden.firstChild.style.width = '0px'
+    menuHidden.firstChild.style.marginRight = '-160px'
 }
 
 function menuOpen() {
     //console.log(menuHidden.firstChild) // menu-aside
     menuHidden.style.display = 'block'
-    setTimeout(() => menuHidden.firstChild.style.width = '160px', 1)    
+    setTimeout(() => menuHidden.firstChild.style.marginRight = '0px', 1)    
 }
