@@ -24,6 +24,15 @@ if (!empty($_GET) and isset($_GET['fn'])) {
         case 'isFamilyExists':
             isFamilyExists($_GET['idUser'], $_GET['description'], $_GET['id']);
             break;
+        case 'getUsersData':
+            getUsersData();
+            break;
+        case 'isUsernameExists':
+            isUsernameExists($_GET['username'], $_GET['id']);
+            break;
+        case 'isEmailExists':
+            isEmailExists($_GET['email'], $_GET['id']);
+            break;
     }
     exit();
 }
@@ -50,12 +59,17 @@ else if (!empty($_POST) and isset($_POST['fn'])) {
         case 'isUserPass':
             isUserPass($_POST['id'], $_POST['pass']);
             break;
-        case 'updateUserData':
-            updateUserData(); # se utiliza $_POST
+        case 'addUpdateUserData':
+            addUpdateUserData(); # se utiliza $_POST
+            break;
+        case 'delUser':
+            delUser($_POST['id']);
             break;
     }
     exit();
 }
+
+##### files #####
 
 function getFileUsers() {
     $usersPath = '../json/users.json';    
@@ -97,6 +111,8 @@ function saveFileFamiles($idUser, $families) {
     $familiesPath = '../json/families'.$idUser.'.json';
     file_put_contents($familiesPath, json_encode($families, JSON_PRETTY_PRINT));
 }
+
+##### users #####
 
 function isUserExists($username, $pass) {
     $response = array('success' => false, 'user' => null);
@@ -155,6 +171,30 @@ function getUserData($token) {
     exit(json_encode($response));    
 }
 
+function isUsernameExists($username, $id) {
+    $response = array('success'=>false);
+    $users = getFileUsers();
+    $usernames = array_column($users, 'username'); # array of username's
+    $key = array_search($username, $usernames);
+    # si key es integer, existe; si es diferente el id, ya esta ocupado
+    if ($key === 0 or $key > 0)
+        if ($users[$key]->id != $id) # ya lo tiene otro usuario
+            $response['success'] = true;
+    exit(json_encode($response));
+}
+
+function isEmailExists($email, $id) {
+    $response = array('success'=>false);
+    $users = getFileUsers();
+    $emails = array_column($users, 'email'); # array of email's
+    $key = array_search($email, $emails);
+    # si key es integer, existe; si es diferente el id, ya esta ocupado
+    if ($key === 0 or $key > 0)
+        if ($users[$key]->id != $id) # ya lo tiene otro usuario
+            $response['success'] = true;
+    exit(json_encode($response));
+}
+
 function getUsers($idUser) {
     $response = array('success'=>false, 'users'=>null);
     $users = getFileUsers();
@@ -168,7 +208,10 @@ function getUsers($idUser) {
     foreach ($users as $key=>$user) {
         # super-adimin o mismo usuario que lo solicita
         if ($idUser == 1 or $user->id == $idUser) {
-            $userSend = array('id'=>$user->id, 'username'=>$user->username); # 
+            $userSend = array(
+                'id'=>$user->id, 
+                'username'=>$user->username
+            ); # 
             array_push($usersSend, $userSend); # add new user created 
             if ($idUser != 1)
                 break;
@@ -180,25 +223,78 @@ function getUsers($idUser) {
     exit(json_encode($response));
 }
 
-function updateUserData() {
+function getUsersData() {
+    $result = array('success'=>false);
+    $users = getFileUsers();
+    
+    # orden alfabetico ascendente
+    usort($users, function ($a, $b) {
+        return $a->username > $b->username;
+    });
+
+    $usersSend = array();
+    foreach ($users as $user) {
+        $userSend = array(
+            'id' => $user->id,
+            'username' => $user->username,
+            'email' => $user->email
+        );
+        array_push($usersSend, $userSend);
+    }
+    $result['success'] = true;
+    $result['users'] = $usersSend;
+    exit(json_encode($result));
+}
+
+function addUpdateUserData() {
     $response = array('success'=>false);
     $users = getFileUsers();
-    $ids = array_column($users, 'id'); # array of id's
-    $key = array_search($_POST['id'], $ids);
-    # key debe ser esctrictamente entero
-    if ($key === 0 or $key > 0) {
-        $users[$key]->username = $_POST['username'];
-        $users[$key]->email = $_POST['email'];
-        if ($_POST['pass'] !== '') {
-            # encriptar pass
-            $_POST['pass'] = password_hash($_POST['pass'], PASSWORD_BCRYPT);
-            $users[$key]->pass = $_POST['pass'];
-        }
+    
+    # add?
+    if (intval($_POST['id']) == 0) {
+        $_POST['pass'] = password_hash($_POST['pass'], PASSWORD_BCRYPT); # encriptar contraseña obligatoria
+        $user = array(
+            'id' => end($users)->id + 1, # max id +1
+            'username' => $_POST['username'],
+            'email' => $_POST['email'],
+            'pass' => $_POST['pass']
+        );
+        array_push($users, $user);
         saveFileUsers($users);
         $response['success'] = true;
     }
+    # update
+    else {
+        $ids = array_column($users, 'id'); # array of id's
+        $key = array_search($_POST['id'], $ids);
+        # key debe ser esctrictamente entero
+        if ($key === 0 or $key > 0) {
+            $users[$key]->username = $_POST['username'];
+            $users[$key]->email = $_POST['email'];
+            if ($_POST['pass'] !== '') {
+                # encriptar pass
+                $_POST['pass'] = password_hash($_POST['pass'], PASSWORD_BCRYPT);
+                $users[$key]->pass = $_POST['pass'];
+            }
+            saveFileUsers($users);
+            $response['success'] = true;        
+        }
+    }
     exit(json_encode($response));
 }
+
+function delUser($id) {
+    $users = getFileUsers();
+    $ids = array_column($users, 'id'); # array of id's
+    $key = array_search($id, $ids);
+    if ($key === 0 or $key > 0) {
+        array_splice($users, $key, 1); # en el array de users ubicar el que tenga el key y eliminar 1 a partir de el
+        saveFileUsers($users);
+    }
+    exit(json_encode(array('success'=>true)));
+}
+
+##### articles #####
 
 function isCodeExists($idUser, $code, $id) {
     $response = array('success' => false, 'description' => null);
@@ -228,16 +324,6 @@ function isDescriptionExists($idUser, $description, $id) {
         }
     }    
     exit(json_encode($response));
-}
-
-function _getFamilyDescription($idUser, $id) {
-    $response = '';
-    $families = getFileFamilies($idUser);
-    $ids = array_column($families, 'id'); # array of id's
-    $key = array_search($id, $ids);
-    if ($key === 0 or $key > 0) 
-        $response = $families[$key]->description;    
-    return $response;
 }
 
 function addUpdateArticle($idUser, $id, $code, $description, $price, $family) {
@@ -337,9 +423,20 @@ function delArticle($idUser, $id) {
         array_splice($articles, $key, 1); # eliminar desde key, 1 elemento
         saveFileArticles($idUser, $articles);
         $response['success'] = true;
-    }
-     
+    }     
     exit(json_encode($response));
+}
+
+##### families #####
+
+function _getFamilyDescription($idUser, $id) {
+    $response = '';
+    $families = getFileFamilies($idUser);
+    $ids = array_column($families, 'id'); # array of id's
+    $key = array_search($id, $ids);
+    if ($key === 0 or $key > 0) 
+        $response = $families[$key]->description;    
+    return $response;
 }
 
 function getFamilies($idUser) {

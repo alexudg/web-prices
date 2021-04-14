@@ -1,3 +1,5 @@
+const URL_SERVER = 'src/php/db.php'
+
 // menu emergente al final para quedar mas arriba en la pila o z
 let html = `<aside class="menu-aside">
                 <img class="menu-close" src="src/img/close24px.png" onclick="menuClose()">
@@ -47,7 +49,7 @@ document.getElementsByTagName('header')[0].innerHTML = html
 document.getElementsByTagName('footer')[0].innerHTML = `<p>footer.html</p>`
 
 async function executeGet(url, isText=false) {
-    let echo = isText ? '' : []
+    let echo = isText ? 'error' : {success: false}
     await fetch(url)
     .then(response => {
         return isText ? response.text() : response.json()
@@ -57,13 +59,13 @@ async function executeGet(url, isText=false) {
         echo = data
     })
     .catch(error => {
-        console.error(error)
+        console.error(error)        
     })
     return echo
 }
 
 async function executePost(url, data, isText=false) {
-    let echo = isText ? '' : []
+    let echo = isText ? 'error' : {success: false}
     await fetch(url, {
         method: 'post',
         body: data, 

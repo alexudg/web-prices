@@ -70,7 +70,7 @@ form.onsubmit = async (eve) => {
     // enviar datos para actualizar
     if (isContinue) {
         formData = new FormData()
-        formData.append('fn', 'updateUserData')
+        formData.append('fn', 'addUpdateUserData')
         formData.append('id', sessionStorage.id)
         formData.append('username', form.username.value)
         formData.append('email', form.email.value)

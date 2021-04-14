@@ -6,16 +6,91 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="shortcut icon" href="src/img/favicon32px.png" type="image/png">
     <link rel="stylesheet" href="src/css/style.css">
+    <link rel="stylesheet" href="src/css/table.css">
+    <link rel="stylesheet" href="src/css/modal.css"> <!-- contiene form.css -->
     <title>Checador de precios</title>
 </head>
 <body>  
     <header></header>  
+    
     <main>
-        
+        <table>            
+            <caption>                
+                <span>Usuarios</span>                 
+                <button onclick="addEditUser(0)"><img src="src/img/add24px.png"></button> 
+            </caption>
+            <thead>                
+                <tr>
+                    <th>ID</th>
+                    <th>username</th>
+                    <th>email</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="tbody">
+                <!-- users -->
+            </tbody>
+            <tfoot> 
+                <tr>
+                    <td colspan="5" id="countUsers"></td>
+                </tr>
+            </tfoot>    
+        </table>
     </main>
+
+    <!-- modal add-update user -->
+    <section class="modal" id="modalAddEdit">
+        <div class="form">
+            <h4 id="formTitle">Agregar-Modificar usuario</h4>
+            <div id="divAddEdit">
+                <form class="form__form" id="form">
+                    <input type="hidden" name="id"> <!-- 0=insert, >0 update -->
+                    <input type="text" name="username" placeholder="*Usuario" required>
+                    <input type="email" name="email" placeholder="*Correo" required>
+                    <input type="checkbox" name="ckPass" id="ckPass" onchange="ckPassChange(this.checked)">
+                    <label for="ckPass" id="lbPass">Cambiar contraseña</label>
+                    <section id="sectionPass" class="form__section-pass">
+                        <input type="password" name="pass" placeholder="*Contraseña">
+                        <input type="password" name="confirm" placeholder="*Confirmar contraseña">
+                    </section>
+                    <h5>*Campos obligatorios</h5>
+                    <div class="form__buttons">
+                        <input type="submit" value="Guardar">
+                        <input type="button" value="Cancelar" onclick="cancelAddEdit()">
+                    </div>
+                </form>
+            </div>
+            <div class="form__status" id="statusArea">
+                <span class="form__status-close" id="btCloseStatus">x</span>
+                <p id="statusText">Lorem ipsum dolor sit amet consectetur adipisicing elit. Ad et recusandae, illo itaque repudiandae quo vel quis eius iste. Sunt provident asperiores saepe, vero suscipit distinctio impedit fuga mollitia itaque!</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- modal del user -->
+    <section class="modal" id="modalDel">
+        <div class="form">
+            <h4>Eliminar usuario</h4>
+            <div id="divDel">
+                <input type="hidden" id="idDel">
+                <p>¿Estás segur@ de eliminar al usuario...?</p>
+                <h4 id="descriptionDel"></h4>
+                <div class="form__buttons">
+                    <button id="btOkDel" onclick="okDel()">Eliminar</button>
+                    <button id="btCancelDel" onclick="cancelDel()">Cancelar</button>
+                </div>
+            </div>
+            <div class="form__status" id="statusDelArea">
+                <span class="form__status-close" id="btCloseStatusDel">x</span>
+                <p class="modal__status-text" id="statusDelText">Lorem ipsum dolor sit amet consectetur adipisicing elit. Ad et recusandae, illo itaque repudiandae quo vel quis eius iste. Sunt provident asperiores saepe, vero suscipit distinctio impedit fuga mollitia itaque!</p>
+            </div>
+        </div>
+    </section>
+    
     <footer></footer>
     <section class="menu-hidden" id="menuHidden"></section>
     <script src="src/js/script.js"></script>
+    <script src="src/js/form.js"></script>
     <script src="src/js/users.js"></script>
 </body>
 </html>

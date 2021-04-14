@@ -77,9 +77,10 @@ header a:hover {
 }
 
 .menu-close {
-    position: fixed;
-    top: 30px;
-    right: 30px;
+    position: relative;
+    top: 25px;
+    right: -95px;
+    
 }
 
 .menu-close:hover {
@@ -88,7 +89,7 @@ header a:hover {
 
 .menu-list {
     /* background-color: silver; */
-    margin-top: 80px;
+    margin-top: 60px;
     list-style: none; /* no viñet */
     padding: 10px;
 }
@@ -126,7 +127,7 @@ a.active {
     color: white;
 }
 
-@media screen and (max-width: 570px) {
+@media screen and (max-width: 640px) {
 
     .navMain {
         display: none;
