@@ -1,5 +1,8 @@
 const URL_SERVER = 'src/php/db.php'
 
+console.log('localStorage.token:', localStorage.token)
+console.log('sessionStorage:', sessionStorage)
+
 // menu emergente al final para quedar mas arriba en la pila o z
 let html = `<aside class="menu-aside">
                 <img class="menu-close" src="src/img/close24px.png" onclick="menuClose()">

@@ -1,5 +1,5 @@
 window.onload = () => {
-    sessionStorage.clear()
     localStorage.removeItem('token')
+    sessionStorage.clear()
     window.location.replace('input.html')
 }  

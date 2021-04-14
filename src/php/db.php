@@ -33,6 +33,12 @@ if (!empty($_GET) and isset($_GET['fn'])) {
         case 'isEmailExists':
             isEmailExists($_GET['email'], $_GET['id']);
             break;
+        case 'getNewTokenUser':
+            getNewTokenUser($_GET['email']);
+            break;
+        case 'isEmailTokenExists':
+            isEmailTokenExists($_GET['email'], $_GET['token']);
+            break;
     }
     exit();
 }
@@ -64,6 +70,9 @@ else if (!empty($_POST) and isset($_POST['fn'])) {
             break;
         case 'delUser':
             delUser($_POST['id']);
+            break;
+        case 'updatePass':
+            updatePass($_POST['id'], $_POST['pass']);
             break;
     }
     exit();
@@ -292,6 +301,56 @@ function delUser($id) {
         saveFileUsers($users);
     }
     exit(json_encode(array('success'=>true)));
+}
+
+function getNewTokenUser($email) {
+    $response = array('success'=>false, 'token'=>null);
+    $users = getFileUsers();
+    $emails = array_column($users, 'email'); # array of email's
+    $key = array_search($email, $emails);
+    if ($key === 0 or $key > 0) {
+        # generar token
+        $token = '';
+        for ($i=0; $i < 8; $i++)
+            $token .= dechex(rand(0, 15));
+        $users[$key]->token = $token;
+        saveFileUsers($users);
+        $response['success'] = true;
+        $response['token'] = $token;    
+    }
+    exit(json_encode($response));
+}
+
+function isEmailTokenExists($email, $token) {
+    $response = array('success'=>false, 'id'=>null);
+    $users = getFileUsers();
+    $emails = array_column($users, 'email'); # array of email's
+    $key = array_search($email, $emails);
+    # email exists
+    if ($key === 0 or $key > 0) {
+        # token equals
+        if ($users[$key]->token == $token)
+            $response['success'] = true; 
+            $response['id'] = $users[$key]->id; # retornar id
+    }
+    exit(json_encode($response));
+}
+
+function updatePass($id, $pass) {
+    $response = array('success'=>false);
+    $users = getFileUsers();
+    $ids = array_column($users, 'id');
+    $key = array_search($id, $ids);
+    # registro encontrado
+    if ($key === 0 or $key > 0) {
+        $pass = password_hash($pass, PASSWORD_BCRYPT);
+        $users[$key]->pass = $pass;
+        # del token expired
+        $users[$key]->token = '';
+        saveFileUsers($users);
+        $response['success'] = true;
+    }
+    exit(json_encode($response));
 }
 
 ##### articles #####

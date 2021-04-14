@@ -401,20 +401,17 @@ form.onsubmit = async (eve) => {
     }
 }
 
-window.onload = async () => {
-    
-    if (!sessionStorage.id)
-        window.location.replace('input.html')
-    console.log('localStorage.token:', localStorage.token)
-    console.log('sessionStorage: ', sessionStorage) 
+window.onload = async () => {    
     if (!sessionStorage.id) {
         window.location.href = 'input.html'
     }
-    btDashboard.classList.add('active')
-    btDashboardList.classList.add('active')
-    searchArticle.focus()
-    // searchArticle.value = '*'
-    // loadArticles()  
-    await loadUsersSelect() 
-    idUserSelected = selUsers.options[selUsers.selectedIndex].value     
+    else {
+        btDashboard.classList.add('active')
+        btDashboardList.classList.add('active')
+        searchArticle.focus()
+        await loadUsersSelect() 
+        idUserSelected = selUsers.options[selUsers.selectedIndex].value     
+        // searchArticle.value = '*'
+        // loadArticles()  
+    }    
 } 

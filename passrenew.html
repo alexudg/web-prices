@@ -13,26 +13,27 @@
     <header></header>
     <main>
         <div class="form">
-            <h4>Olvidé mi contraseña</h4>
+            <h4>Renovar contraseña</h4>
             <div id="divForm">
                 <form class="form__form" id="form">
-                    <input type="email" name="email" placeholder="*Correo">
+                    <input type="hidden" name="id">
+                    <input type="password" name="pass" placeholder="*Nueva contraseña" required>
+                    <input type="password" name="confirm" placeholder="*Confirmar nueva contraseña" required>
                     <h5>*Campo obligatorio</h5>
-                    <input type="submit" value="Enviarme un correo">
+                    <input type="submit" value="Renovar contraseña">
                 </form>
             </div>
             <div class="form__status" id="statusArea">
                 <span class="form__status-close" onclick="closeStatus()">x</span>
                 <p class="modal__status-text" id="statusText">Lorem ipsum dolor sit amet consectetur adipisicing elit. Ad et recusandae, illo itaque repudiandae quo vel quis eius iste. Sunt provident asperiores saepe, vero suscipit distinctio impedit fuga mollitia itaque!</p>
             </div>
-            <a href="input.html">Ingresar</a>
+            <a id="link" href="passlost.html">Olvidé mi contraseña</a>
         </div>
     </main>
     <footer></footer>
     <section class="menu-hidden" id="menuHidden"></section>
     <script src="src/js/script.js"></script>
-    <script src="https://smtpjs.com/v3/smtp.js"></script>
     <script src="src/js/form.js"></script>
-    <script src="src/js/passlost.js"></script>
+    <script src="src/js/passrenew.js"></script>
 </body>
 </html>

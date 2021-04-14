@@ -202,11 +202,9 @@ async function loadUsers() {
 }
 
 window.onload = () => {
-    if (!sessionStorage.id)
+    if (!sessionStorage.id || sessionStorage.id != '1')
         window.location.href = 'input.html'
     else {
-        console.log('localStorage.token:', localStorage.token)
-        console.log('sessionStorage:', sessionStorage)
         btUsers.classList.add('active')
         btUsersList.classList.add('active')
         loadUsers()
