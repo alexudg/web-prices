@@ -39,7 +39,7 @@ async function editArticle(id) {
 function delArticle(id, description) {
     //console.log(id, description)
     idToDel.value = id
-    descriptionToDel.innerText = description + '?'
+    descriptionToDel.innerText = description
     modalDel.style.display = 'flex'
 }
 
@@ -402,6 +402,7 @@ form.onsubmit = async (eve) => {
 }
 
 window.onload = async () => {
+    
     if (!sessionStorage.id)
         window.location.replace('input.html')
     console.log('localStorage.token:', localStorage.token)
@@ -410,9 +411,10 @@ window.onload = async () => {
         window.location.href = 'input.html'
     }
     btDashboard.classList.add('active')
+    btDashboardList.classList.add('active')
     searchArticle.focus()
     // searchArticle.value = '*'
     // loadArticles()  
     await loadUsersSelect() 
-    idUserSelected = selUsers.options[selUsers.selectedIndex].value 
+    idUserSelected = selUsers.options[selUsers.selectedIndex].value     
 } 

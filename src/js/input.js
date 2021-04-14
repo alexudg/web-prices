@@ -59,7 +59,8 @@ window.onload = () => {
         window.location.replace('dashboard.html')
     console.log('localStorage.token: ', localStorage.token)
     console.log('sessionStorage: ', sessionStorage)  
-    btInput.classList.add('active')    
+    btInput.classList.add('active')   
+    btInputList.classList.add('active') 
     // si ya existe token, ir por el usuario a la base de datos
     form.username.focus()    
     if (localStorage.token) { 

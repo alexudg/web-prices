@@ -14,10 +14,12 @@
         <p>index.html</p>
     </main>
     <footer></footer>
+    <section class="menu-hidden" id="menuHidden"></section>
     <script src="src/js/script.js"></script>
     <script>
         window.onload = () => {
             btIndex.classList.add('active')
+            btIndexList.classList.add('active')
             console.log('localStorage.token: ', localStorage.token)
             console.log('sessionStorage: ', sessionStorage)
         }               

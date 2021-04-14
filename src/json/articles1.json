@@ -33,5 +33,12 @@
         "description": "articulo cuatro de admin",
         "price": 44.4,
         "family": "familia cuatro de admin"
+    },
+    {
+        "id": 6,
+        "code": "",
+        "description": "fsdf",
+        "price": 0.5,
+        "family": "familia cinco de admin"
     }
 ]

@@ -33,9 +33,10 @@ header > img {
 
 header a {
     background-color: dodgerblue;
+    color: black;
     text-decoration: none;
-    margin-left: 10px;
-    padding: 10px;
+    margin-left: 5px;
+    padding: 5px;
     border-radius: 5px;
 }
 
@@ -43,9 +44,69 @@ header a:hover {
     cursor: pointer;
 }
 
-.active {
-    background-color: blue;
-    color: white;
+.btmenu {
+    background-color: rgba(0, 0, 0, 0);
+    width: 32px;
+    height: 32px;
+    border: none; 
+    display: none;   
+}
+
+.btmenu:hover {
+    cursor: pointer;
+}
+
+.menu-hidden {
+    background-color: rgba(0, 0, 0, 0.5);
+    position: fixed;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    display: none;
+}
+
+.menu-aside {
+    background-color: lightblue;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 10px; 
+    transition: width 0.5s;    
+}
+
+.menu-close {
+    position: fixed;
+    top: 30px;
+    right: 30px;
+}
+
+.menu-close:hover {
+    cursor: pointer;
+}
+
+.menu-list {
+    /* background-color: silver; */
+    margin-top: 80px;
+    list-style: none; /* no viñet */
+    padding: 10px;
+}
+
+.menu-list > li {
+    /* background-color: red;
+    border: 1px solid; */
+    margin-top: 5px;
+}
+
+.menu-list a {
+    background-color: dodgerblue;
+    color: black;
+    text-decoration: none;
+    display: block;
+    width: 100%;
+    padding: 5px;
+    border-radius: 5px;
 }
 
 main {
@@ -58,4 +119,20 @@ main {
 footer {
     background-color: dodgerblue;
     width: 100%;
+}
+
+a.active {
+    background-color: blue;
+    color: white;
+}
+
+@media screen and (max-width: 570px) {
+
+    .navMain {
+        display: none;
+    }
+
+    .btmenu {
+        display: inline;
+    }
 }

@@ -8,10 +8,11 @@
 }
 
 .form > h4 {
-    margin: 8px 0;
+    margin: 10px 0;
 }
 
-.form__form input:not([type=search]):not([type=checkbox]),
+/* inputs text */
+.form__form input:not([type=checkbox]),
 .form__families > select {
     border: none;
     width: 100%;
@@ -84,16 +85,17 @@
     display: none;
 }
 
+/* guardar unico o eliminar aparejado de cancel */
 .form__form input[type=submit],
-.form__buttons > button:first-child {
-    background-color: blue;
+.form__buttons button:first-child {
+    background-color: blue;    
     color: white;
     height: 35px;
     font-size: 12pt;
     /* margin-top: 10px; */
 }
 
-/* submit sin boton 'cancelar' al costado */
+/* submit unico sin boton 'cancelar' al costado */
 .form__form > input[type=submit] {
     margin-top: 10px;
 }
@@ -105,15 +107,14 @@
 /* width 100% */
 .form__buttons {
     /* background-color: silver; */
-    /* height: 50px; */
     margin-top: 10px;
     display: flex;
     justify-content: space-between;  
     align-items: center;  
 }
 
-.form__buttons > [type=submit],
-.form__buttons > [type=button],
+.form__buttons > input[type=submit],
+.form__buttons > input[type=button],
 .form__buttons > button {
     width: 45%;
     border: none;
