@@ -1,5 +1,3 @@
-const URL_SERVER = 'src/php/db.php'
-
 console.log('localStorage.token:', localStorage.token)
 console.log('sessionStorage:', sessionStorage)
 

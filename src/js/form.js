@@ -1,3 +1,5 @@
+const URL_SERVER = 'src/php/db.php'
+
 function showStatus(txt='Ocurrió un error de comunicación', isError=true) {
     const color = isError ? 'salmon' : 'lightgreen'
     statusText.innerHTML = txt

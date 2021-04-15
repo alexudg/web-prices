@@ -18,6 +18,13 @@ table > caption {
     position: relative;
 }
 
+table > caption > h6 {
+    font-size: 9pt;
+    position: absolute;
+    left: 4px;
+    top: 1px;
+}
+
 table input[type=search] {
     /* border: 1px solid; */
     background-color: whitesmoke;
@@ -28,7 +35,7 @@ table input[type=search] {
     border-radius: 5px; 
     position: absolute; 
     left: 5px; 
-    top: 10px;
+    top: 15px;
 }
 
 table > caption > button {

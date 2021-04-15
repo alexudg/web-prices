@@ -15,8 +15,9 @@
     <main>
         <table>            
             <caption>
+                <h6>Para encontrar todo "."</h6>
                 <input type="search" id="searchArticle" placeholder="buscar..." onchange="loadArticles()">
-                <span>Artículos</span> 
+                <span>Artículos</span>
                 <select name="iduser" id="selUsers" onchange="selUsersChange()">
                     <!-- usuarios existentes -->
                 </select>
@@ -36,7 +37,8 @@
             </tbody>
             <tfoot> 
                 <tr>
-                    <td colspan="5" id="countArticles"></td>
+                    <td id="username" colspan="2"></td>
+                    <td colspan="3" id="countArticles"></td>
                 </tr>
             </tfoot>    
         </table>

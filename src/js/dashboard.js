@@ -408,6 +408,7 @@ window.onload = async () => {
     else {
         btDashboard.classList.add('active')
         btDashboardList.classList.add('active')
+        username.innerText = 'Usuario: ' + sessionStorage.username
         searchArticle.focus()
         await loadUsersSelect() 
         idUserSelected = selUsers.options[selUsers.selectedIndex].value     

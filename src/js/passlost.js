@@ -1,3 +1,7 @@
+//const URL_PASS_RENEW = 'http://192.168.0.27/web-prices' // PC
+//const URL_PASS_RENEW = 'http://192.168.0.27/web-prices' // laptop
+const URL_PASS_RENEW = 'http://gucitex.com.mx/05' // gucitex
+
 function closeStatus() {
     statusArea.style.display = 'none'
 }
@@ -18,7 +22,7 @@ form.onsubmit = async (eve) => {
             statusArea.style.backgroundColor = 'silver'
             statusText.innerText = 'Enviando correo...'
             statusArea.style.display = 'block'
-            const uri = 'http://127.0.0.1/web-prices/passrenew.html?email=' + form.email.value + '&token=' + response.token
+            const uri = URL_PASS_RENEW + '/passrenew.html?email=' + form.email.value + '&token=' + response.token 
                 Email.send({
                     Host : 'smtp.gmail.com',
                     Username : 'puntoplanet',

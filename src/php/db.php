@@ -298,6 +298,9 @@ function delUser($id) {
     $key = array_search($id, $ids);
     if ($key === 0 or $key > 0) {
         array_splice($users, $key, 1); # en el array de users ubicar el que tenga el key y eliminar 1 a partir de el
+        # eliminar familias y articulos de este usuario
+        unlink('../json/families'.$id.'.json');
+        unlink('../json/articles'.$id.'.json');
         saveFileUsers($users);
     }
     exit(json_encode(array('success'=>true)));
