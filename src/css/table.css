@@ -1,21 +1,22 @@
 table {
-    border: 0.5px solid silver;
+    border: 0.5px solid black;
     display: block;
     border-collapse: collapse;
-    min-width: 320px;
-    margin: 10px;
+    border-spacing: 0;
+    /* width: 98%; */
+    margin: 10px auto;
     padding: 5px;
     font-size: 14pt;
     border-radius: 5px; 
-    overflow-x: auto; 
-    white-space: nowrap; /* no estrechar al encojer anchura */ 
+    overflow-x: auto;
+    white-space: nowrap; /* no estrechar al encojer anchura */     
 }
 
 table > caption {
     border: 0.5px solid silver;
     border-radius: 5px;
     height: 45px;
-    position: relative;
+    position: relative;    
 }
 
 table > caption > h6 {
@@ -103,4 +104,10 @@ table > tfoot td {
     text-align: center;
     padding: 5px 0;
     border-radius: 3px;
+}
+
+@media screen and (max-width: 768px) {
+    table {
+        width: 98%;
+    }
 }

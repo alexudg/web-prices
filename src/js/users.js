@@ -207,6 +207,7 @@ window.onload = () => {
     else {
         btUsers.classList.add('active')
         btUsersList.classList.add('active')
+        btUsersFoot.classList.add('active')
         loadUsers()
     }    
 }

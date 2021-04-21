@@ -59,6 +59,7 @@ window.onload = () => {
         window.location.replace('dashboard.html')
     btInput.classList.add('active')   
     btInputList.classList.add('active') 
+    btInputFoot.classList.add('active')
     // si ya existe token, ir por el usuario a la base de datos
     form.username.focus()    
     if (localStorage.token) { 

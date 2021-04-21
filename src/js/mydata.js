@@ -98,7 +98,8 @@ window.onload = () => {
         window.location.href = 'input.html'
     else {
         btMyData.classList.add('active')  
-        btMyDataList.classList.add('active')  
+        btMyDataList.classList.add('active') 
+        btMyDataFoot.classList.add('active') 
         form.username.value = sessionStorage.username
         form.email.value = sessionStorage.email    
     }

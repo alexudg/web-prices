@@ -47,7 +47,39 @@ html +=`</nav>
 document.getElementsByTagName('header')[0].innerHTML = html
 
 // footer
-document.getElementsByTagName('footer')[0].innerHTML = `<p>footer.html</p>`
+html = `<section>
+            <div>
+                <nav>
+                    <a href="index.html" id="btIndexFoot">Inicio</a>`
+if (!sessionStorage.id)
+    html +=        `<a href="input.html" id="btInputFoot">Ingresar</a>`
+if (sessionStorage.id)
+    html +=        `<a href="dashboard.html" id="btDashboardFoot">Precios</a>
+                    <a href="mydata.html" id="btMyDataFoot">Mis datos</a>`
+if (sessionStorage.id == 1)
+    html +=        `<a href="users.html" id="btUsersFoot">Usuarios</a>` 
+if (sessionStorage.id)
+    html +=        `<a href="exit.html">Salir</a>`       
+html +=        `</nav>
+                <div>
+                    <h4>Tel. 33-1463-1774</h4>
+                </div>
+            </div>
+            <div>
+                <div>
+                    <a class="contact-social" href="https://api.whatsapp.com/send?phone=523314631774&text=Hola%20vi%20su%20sitio%20web%20y%20deseo%20un%20servicio%20con%20ustedes" target="_blank"><img src="src/img/whatsapp32px.png" alt="Whatsapp" title="Whatsapp"></a>
+                    <a class="contact-social" href="http://facebook.com/PuntoPlanet" target="_blank"><img src="src/img/facebook32px.png" alt="Facebook" title="Facebook"></a>
+                </div>
+                <div>
+                    <a href="mailto:puntoplanet@gmail.com">puntoplanet@gmail.com</a>
+                </div>
+            </div>
+        </section>
+        <h5>Derechos y recursos reservados Pla<b>net</b>&reg; sistemas <span id="year">2000</span>.</h5>`
+
+document.getElementsByTagName('footer')[0].innerHTML = html
+
+document.getElementById('year').innerText = new Date().getFullYear()
 
 async function executeGet(url, isText=false) {
     let echo = isText ? 'error' : {success: false}

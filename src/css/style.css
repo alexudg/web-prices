@@ -111,6 +111,7 @@ header a:hover {
 
 main {
     width: 100%;
+    text-align: center;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -121,14 +122,62 @@ h2 {
     margin: 20px 0;
 }
 
+.screen-shot {
+    width: 600px;
+    margin-top: 20px;
+}
+
 .logo {
-    position: relative;
-    top: -70px;
+    width: 200px;
+    margin-bottom: 20px;
 }
 
 footer {
     background-color: dodgerblue;
     width: 100%;
+}
+
+footer > section {
+    /* border: 1px solid white; */
+    display: flex;
+}
+
+footer > section > div {
+    /* border: 1px solid; */
+    width: 50%; 
+    height: 60px;
+}
+
+footer > section > div > div,
+footer nav {
+    /* border: 1px solid red; */
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+footer nav {
+    margin: 6px 0;
+}
+
+footer a {
+    text-decoration: none;
+}
+
+footer nav > a {
+    background-color: gainsboro;
+    padding: 2px;
+    margin: 0 3px;
+    border-radius: 3px;
+}
+
+.contact-social {
+    margin: 3px 8px;
+}
+
+footer > h5 {
+    text-align: center;
 }
 
 a.active {
@@ -144,5 +193,18 @@ a.active {
     /* menu burguer */
     .btmenu {
         display: inline;
+    }
+
+    .screen-shot {
+        width: 300px;
+    }
+
+    footer > section {
+        flex-direction: column;
+    }
+
+    footer > section > div,
+    footer nav {
+        width: 100%;
     }
 }

@@ -4,6 +4,13 @@
         "email": "alexudg@gmail.com",
         "username": "admin",
         "pass": "$2y$10$5uxoohcElcS7x8uhVtO2O.GXzFevMWDNZ.kkoUCHXm9MMQWVDcl9y",
-        "token": "e93dbb4d"
+        "token": "32e13cff"
+    },
+    {
+        "id": 2,
+        "username": "Julio",
+        "email": "gestoriaglobalmx@gmail.com",
+        "pass": "$2y$10$UYYpw2sr0pkjZmS4Pd0Gsu07RK2Ce.S.hdeqoaWr.IgKyIB60Te.K",
+        "token": "c2327674"
     }
 ]
