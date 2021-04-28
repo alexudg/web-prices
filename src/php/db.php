@@ -1,5 +1,8 @@
 <?php
 
+//exit(phpinfo()); # extensiones habilitadas
+//exit(ini_get('disable_functions')); # funciones deshabilitadas
+
 if (!empty($_GET) and isset($_GET['fn'])) {
     //exit(json_encode($_GET));
     switch ($_GET['fn']) {
@@ -96,7 +99,7 @@ class Database {
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC, // only column_name => value
             )            
         );
-        echo 'DB created';
+        #echo 'DB created';
     } 
     
     static function executeSql($sql, $params=null, $all=true) {
@@ -117,7 +120,7 @@ class Database {
     }
 }
 
-/*
+//*
 test();
 function test() {
     //$sql = 'SELECT * FROM users';
@@ -125,7 +128,7 @@ function test() {
     $sql = 'SELECT * FROM users WHERE id = ?';
     $params = array(1);
     $response = Database::executeSql($sql, $params, false);
-    $response['result']['id'] += 0;
+    $response['result']['id'] += 0; # string to int
     echo '<pre>';
     //var_dump($response);
     echo json_encode($response);
