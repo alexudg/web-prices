@@ -1,4 +1,4 @@
-console.log('localStorage.token:', localStorage.token)
+console.log('localStorage.prices_token:', localStorage.prices_token)
 console.log('sessionStorage:', sessionStorage)
 
 // header
@@ -6,14 +6,14 @@ let html = `<a href="index.html"><img src="src/img/logo300x185px.png" alt="Logot
         <span>Checador de precios</span>
         <nav class="navMain">
             <a href="index.html" id="btIndex">Inicio</a>`
-if (!sessionStorage.id)
+if (!sessionStorage.prices_id)
     html +=`<a href="input.html" id="btInput">Ingresar</a>`
 //var id = sessionStorage.getItem('id')
-if (sessionStorage.id)
+if (sessionStorage.prices_id)
     html +=`<a href="dashboard.html" id="btDashboard">Precios</a><a href="mydata.html" id="btMyData">Mis datos</a>` // en linea porque genera espacio si se pasa al sig renglon
-if (sessionStorage.id == '1') // super-admin
+if (sessionStorage.prices_id == '1') // super-admin
     html +=`<a href="users.html" id="btUsers">Usuarios</a>`
-if (sessionStorage.id)
+if (sessionStorage.prices_id)
     html +=`<a href="exit.html" id="btExit">Salir</a>`            
 html +=`</nav>
         <img class="btmenu" src="src/img/menu32px.png" onclick="menuOpen()">`           
@@ -25,14 +25,14 @@ html = `<aside class="menu-aside">
                 <img class="menu-close" src="src/img/close24px.png" onclick="menuClose()">
                 <ul class="menu-list">
                     <li><a href="index.html" id="btIndexList">Inicio</a></li>`
-if (!sessionStorage.id)
+if (!sessionStorage.prices_id)
     html +=        `<li><a href="input.html" id="btInputList">Ingresar</a></li>`
-if (sessionStorage.id)
+if (sessionStorage.prices_id)
     html +=        `<li><a href="dashboard.html" id="btDashboardList">Precios</a></li>
                     <li><a href="mydata.html" id="btMyDataList">Mis datos</a></li>`
-if (sessionStorage.id == '1') // super-admin
+if (sessionStorage.prices_id == '1') // super-admin
     html +=        `<li><a href="users.html" id="btUsersList">Usuarios</a></li>`
-if (sessionStorage.id)
+if (sessionStorage.prices_id)
     html +=        `<li><a href="exit.html" id="btExitList">Salir</a></li>`
     html +=    `</ul>
             </aside>`
@@ -51,14 +51,14 @@ html = `<section>
             <div>
                 <nav>
                     <a href="index.html" id="btIndexFoot">Inicio</a>`
-if (!sessionStorage.id)
+if (!sessionStorage.prices_id)
     html +=        `<a href="input.html" id="btInputFoot">Ingresar</a>`
-if (sessionStorage.id)
+if (sessionStorage.prices_id)
     html +=        `<a href="dashboard.html" id="btDashboardFoot">Precios</a>
                     <a href="mydata.html" id="btMyDataFoot">Mis datos</a>`
-if (sessionStorage.id == 1)
+if (sessionStorage.prices_id == 1)
     html +=        `<a href="users.html" id="btUsersFoot">Usuarios</a>` 
-if (sessionStorage.id)
+if (sessionStorage.prices_id)
     html +=        `<a href="exit.html">Salir</a>`       
 html +=        `</nav>
                 <div>

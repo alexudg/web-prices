@@ -1,5 +1,5 @@
 let searchText = ''
-let idUserSelected = sessionStorage.id
+let idUserSelected = sessionStorage.prices_id
 
 function addArticle() {
     formTitle.innerText = 'Agregar artículo'
@@ -58,7 +58,7 @@ async function loadUsersSelect() {
         selUsers.innerHTML +=  `<option value="${user.id}">${user.username}</option>`        
     })
     // if super-admin, select admin
-    if (sessionStorage.id == '1') {
+    if (sessionStorage.prices_id == '1') {
         for (const option of selUsers.options) {
             if (option.value == '1') {
                 selUsers.selectedIndex = option.index
@@ -402,14 +402,14 @@ form.onsubmit = async (eve) => {
 }
 
 window.onload = async () => {    
-    if (!sessionStorage.id) {
+    if (!sessionStorage.prices_id) {
         window.location.href = 'input.html'
     }
     else {
         btDashboard.classList.add('active')
         btDashboardList.classList.add('active')
         btDashboardFoot.classList.add('active')
-        username.innerText = 'Usuario: ' + sessionStorage.username
+        username.innerText = 'Usuario: ' + sessionStorage.prices_username
         searchArticle.focus()
         await loadUsersSelect() 
         idUserSelected = selUsers.options[selUsers.selectedIndex].value     

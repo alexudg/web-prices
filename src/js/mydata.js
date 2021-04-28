@@ -37,7 +37,7 @@ form.onsubmit = async (eve) => {
     // verificar contraseña actual si el check esta activado
     if (ckPass.checked) {
         formData.append('fn', 'isUserPass')
-        formData.append('id', sessionStorage.id)
+        formData.append('id', sessionStorage.prices_id)
         formData.append('pass', form.passOld.value)
         const response = await executePost('src/php/db.php', formData) // script.js
         //console.log(response) // {success: false|true}
@@ -71,21 +71,21 @@ form.onsubmit = async (eve) => {
     if (isContinue) {
         formData = new FormData()
         formData.append('fn', 'addUpdateUserData')
-        formData.append('id', sessionStorage.id)
+        formData.append('id', sessionStorage.prices_id)
         formData.append('username', form.username.value)
         formData.append('email', form.email.value)
         formData.append('pass', form.pass.value) // ''=no cambiar
         const response = await executePost('src/php/db.php', formData)
-        console.log(response) // {success: false|true}
+        console.log(response) // {success: false|true, exception:<string>|null, result: false|true}
         if (response.success) {
             sectionForm.style.display = 'none'
-            sessionStorage.username = form.username.value
-            sessionStorage.email = form.email.value
+            sessionStorage.prices_username = form.username.value
+            sessionStorage.prices_email = form.email.value
             form.reset()
             showStatus('Tus datos han sido actualizados.', false)            
             setTimeout(() => {
                 window.location.href = 'dashboard.html'
-                sectionForm.sytle.display = 'block'
+                sectionForm.style.display = 'block'
             }, 2000)
         }
         else
@@ -94,13 +94,14 @@ form.onsubmit = async (eve) => {
 }
 
 window.onload = () => {
-    if (!sessionStorage.id) 
+    if (!sessionStorage.prices_id) {
         window.location.href = 'input.html'
+    }
     else {
         btMyData.classList.add('active')  
         btMyDataList.classList.add('active') 
         btMyDataFoot.classList.add('active') 
-        form.username.value = sessionStorage.username
-        form.email.value = sessionStorage.email    
+        form.username.value = sessionStorage.prices_username
+        form.email.value = sessionStorage.prices_email    
     }
 }

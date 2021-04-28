@@ -202,7 +202,7 @@ async function loadUsers() {
 }
 
 window.onload = () => {
-    if (!sessionStorage.id || sessionStorage.id != '1')
+    if (!sessionStorage.prices_id || sessionStorage.prices_id != '1')
         window.location.href = 'input.html'
     else {
         btUsers.classList.add('active')
