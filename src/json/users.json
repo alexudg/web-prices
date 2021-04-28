@@ -3,14 +3,14 @@
         "id": 1,
         "email": "alexudg@gmail.com",
         "username": "admin",
-        "pass": "$2y$10$5uxoohcElcS7x8uhVtO2O.GXzFevMWDNZ.kkoUCHXm9MMQWVDcl9y",
-        "token": "32e13cff"
+        "pass": "$2y$10$cHhJOKBmoR3S.CE2wEQp2ebJcb1VZPQbhq6C..JneKtOa6lkIV5aa",
+        "token": "c289d3d4"
     },
     {
         "id": 2,
         "username": "Julio",
         "email": "gestoriaglobalmx@gmail.com",
         "pass": "$2y$10$UYYpw2sr0pkjZmS4Pd0Gsu07RK2Ce.S.hdeqoaWr.IgKyIB60Te.K",
-        "token": "c2327674"
+        "token": "f2289d46"
     }
 ]

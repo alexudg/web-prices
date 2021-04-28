@@ -40,5 +40,12 @@
         "description": "articulo seis de admin",
         "price": 66.6,
         "family": "familia seis de admin"
+    },
+    {
+        "id": 7,
+        "code": "258",
+        "description": "articulo dos cincuenta y ocho",
+        "price": 155.5,
+        "family": "familia cinco de admin"
     }
 ]

@@ -1,8 +1,27 @@
 console.log('localStorage.token:', localStorage.token)
 console.log('sessionStorage:', sessionStorage)
 
+// header
+let html = `<a href="index.html"><img src="src/img/logo300x185px.png" alt="Logotipo"></a>
+        <span>Checador de precios</span>
+        <nav class="navMain">
+            <a href="index.html" id="btIndex">Inicio</a>`
+if (!sessionStorage.id)
+    html +=`<a href="input.html" id="btInput">Ingresar</a>`
+//var id = sessionStorage.getItem('id')
+if (sessionStorage.id)
+    html +=`<a href="dashboard.html" id="btDashboard">Precios</a><a href="mydata.html" id="btMyData">Mis datos</a>` // en linea porque genera espacio si se pasa al sig renglon
+if (sessionStorage.id == '1') // super-admin
+    html +=`<a href="users.html" id="btUsers">Usuarios</a>`
+if (sessionStorage.id)
+    html +=`<a href="exit.html" id="btExit">Salir</a>`            
+html +=`</nav>
+        <img class="btmenu" src="src/img/menu32px.png" onclick="menuOpen()">`           
+
+document.getElementsByTagName('header')[0].innerHTML = html
+
 // menu emergente al final para quedar mas arriba en la pila o z
-let html = `<aside class="menu-aside">
+html = `<aside class="menu-aside">
                 <img class="menu-close" src="src/img/close24px.png" onclick="menuClose()">
                 <ul class="menu-list">
                     <li><a href="index.html" id="btIndexList">Inicio</a></li>`
@@ -27,25 +46,6 @@ menuHidden.onclick = (eve) => {
     }
 }
 
-// header
-html = `<img src="src/img/logo300x185px.png" alt="Logotipo">
-        <span>Checador de precios</span>
-        <nav class="navMain">
-            <a href="index.html" id="btIndex">Inicio</a>`
-if (!sessionStorage.id)
-    html +=`<a href="input.html" id="btInput">Ingresar</a>`
-//var id = sessionStorage.getItem('id')
-if (sessionStorage.id)
-    html +=`<a href="dashboard.html" id="btDashboard">Precios</a><a href="mydata.html" id="btMyData">Mis datos</a>` // en linea porque genera espacio si se pasa al sig renglon
-if (sessionStorage.id == '1') // super-admin
-    html +=`<a href="users.html" id="btUsers">Usuarios</a>`
-if (sessionStorage.id)
-    html +=`<a href="exit.html" id="btExit">Salir</a>`            
-html +=`</nav>
-        <img class="btmenu" src="src/img/menu32px.png" onclick="menuOpen()">`           
-
-document.getElementsByTagName('header')[0].innerHTML = html
-
 // footer
 html = `<section>
             <div>
@@ -68,7 +68,7 @@ html +=        `</nav>
             <div>
                 <div>
                     <a class="contact-social" href="https://api.whatsapp.com/send?phone=523314631774&text=Hola%20vi%20su%20sitio%20web%20y%20deseo%20un%20servicio%20con%20ustedes" target="_blank"><img src="src/img/whatsapp32px.png" alt="Whatsapp" title="Whatsapp"></a>
-                    <a class="contact-social" href="http://facebook.com/PuntoPlanet" target="_blank"><img src="src/img/facebook32px.png" alt="Facebook" title="Facebook"></a>
+                    <a class="contact-social" href="http://facebook.com/PlanetSistemas" target="_blank"><img src="src/img/facebook32px.png" alt="Facebook" title="Facebook"></a>
                 </div>
                 <div>
                     <a href="mailto:puntoplanet@gmail.com">puntoplanet@gmail.com</a>

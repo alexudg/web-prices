@@ -27,11 +27,12 @@ header {
     padding: 10px 0;
 }
 
-header > img {
+
+header img {
     width: 100px;
 }
 
-header a {
+header > nav > a {
     background-color: dodgerblue;
     color: black;
     text-decoration: none;
