@@ -78,6 +78,61 @@ else if (!empty($_POST) and isset($_POST['fn'])) {
     exit();
 }
 
+##### sqlite #####
+
+class Database {
+    static $db = null;
+    
+    static function loadDatabase() {
+        self::$db = new PDO(
+            'sqlite:../db/prices.db', # dsn path from here
+            null, # username
+            null, # password
+            #options
+            array(
+                PDO::ATTR_STRINGIFY_FETCHES => false, # evitar todo valor string
+                PDO::ATTR_EMULATE_PREPARES => false, # evita que todo se trate como string (no funciona en sqlite) 
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC, // only column_name => value
+            )            
+        );
+        echo 'DB created';
+    } 
+    
+    static function executeSql($sql, $params=null, $all=true) {
+        $response = array('success'=>false, 'exception'=>null, 'result'=>null);
+        try {
+            if (self::$db == null)
+                self::loadDatabase();
+            $sta = self::$db->prepare($sql);
+            $sta->execute($params);
+            $result = $all ? $sta->fetchAll() : $sta->fetch();
+            $response['success'] = true;
+            $response['result'] = $result;
+        }
+        catch (Exception $e) {
+            $response['exception'] = $e->getMessage();
+        }
+        return $response;
+    }
+}
+
+/*
+test();
+function test() {
+    //$sql = 'SELECT * FROM users';
+    //$response = Database::executeSql($sql);
+    $sql = 'SELECT * FROM users WHERE id = ?';
+    $params = array(1);
+    $response = Database::executeSql($sql, $params, false);
+    $response['result']['id'] += 0;
+    echo '<pre>';
+    //var_dump($response);
+    echo json_encode($response);
+    echo '</pre>';
+}
+//*/
+
 ##### files #####
 
 function getFileUsers() {
