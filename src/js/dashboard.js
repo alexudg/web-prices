@@ -11,22 +11,22 @@ function addArticle() {
 
 async function editArticle(id) {
     // solicitud de datos del articulo
-    const response = await executeGet('src/php/db.php?fn=getArticle&idUser=' + idUserSelected + '&id=' + id)
-    //console.log(response) // {success: false|true, article: null|{}}
-    if (response.success) {
+    const response = await executeGet('src/php/db.php?fn=getArticle&id=' + id)
+    //console.log(response) // success:false|true, exception:<string>|null, result:null|false|{object}
+    if (response.success && response.result) {
         formTitle.innerText = 'Modificar artículo'
         form.id.value = id
-        form.code.value = response.article.code
-        form.description.value = response.article.description
-        form.price.value = response.article.price
+        form.code.value = response.result.code
+        form.description.value = response.result.description
+        form.price.value = response.result.price
         await loadSelectFamilies()
 
         // seleccionar su familia
-        for (const option of form.family.options) {
-            //console.log('option: ', option.innerText, ', family: ', response.article.family);
-            if (option.innerText === response.article.family) {
+        for (const option of form.idFamily.options) {
+            //console.log('option: ', option.innerText, ', family: ', response.result.family);
+            if (option.value === response.result.id_family) {
                 //console.log(option.value)
-                form.family.selectedIndex = option.index;
+                form.idFamily.selectedIndex = option.index;
                 break;
             }
         }
@@ -127,8 +127,8 @@ function editFamily(event) {
     event.preventDefault()
     //console.log('editFamily')
     formFamilyTitle.innerText = 'Editar familia'
-    formFamily.id.value = form.family.options[form.family.selectedIndex].value // id a modificar
-    formFamily.description.value = form.family.options[form.family.selectedIndex].innerText
+    formFamily.id.value = form.idFamily.options[form.idFamily.selectedIndex].value // id a modificar
+    formFamily.description.value = form.idFamily.options[form.idFamily.selectedIndex].innerText
     modalAddEditFamily.style.display = 'flex'
     formFamily.description.focus()
 }
@@ -136,8 +136,8 @@ function editFamily(event) {
 function delFamily(event) {
     event.preventDefault()
     //console.log('delFamily')
-    idFamilyDel.value = form.family.options[form.family.selectedIndex].value // id a eliminar
-    descriptionFamilyDel.innerText = form.family.options[form.family.selectedIndex].innerText
+    idFamilyDel.value = form.idFamily.options[form.idFamily.selectedIndex].value // id a eliminar
+    descriptionFamilyDel.innerText = form.idFamily.options[form.idFamily.selectedIndex].innerText
     modalFamilyDel.style.display = 'flex'   
 }
 
@@ -157,9 +157,9 @@ async function loadSelectFamilies() {
         const visibility =  response.result.length > 0 ? 'visible' : 'hidden'
         btEditFamily.style.visibility = visibility
         btDelFamily.style.visibility = visibility
-        form.family.innerHTML = ''
+        form.idFamily.innerHTML = ''
         response.result.forEach(family => {
-            form.family.innerHTML += `<option value="${family.id}">${family.description}</option>`
+            form.idFamily.innerHTML += `<option value="${family.id}">${family.description}</option>`
         })
     }    
 }
@@ -173,12 +173,11 @@ btOkDel.onclick = async () => {
     divDelArticle.style.display = 'none'
     formData = new FormData
     formData.append('fn', 'delArticle')
-    formData.append('idUser',idUserSelected)
     formData.append('id', idToDel.value)
     const response = await executePost('src/php/db.php', formData) // script.js
-    //console.log(response)
+    //console.log(response) // success:false|true, exception:<string>|null, result:null|true
     //return
-    if (response.success) {
+    if (response.success && response.result) {
         showStatusDel('El artículo ha sido eliminado.', false) // form.js
         setTimeout(() => {
             modalDel.click() // se genera el param 'eve'
@@ -202,11 +201,10 @@ btOkFamilyDel.onclick = async () => {
     divDelFamily.style.display = 'none'
     formData = new FormData()
     formData.append('fn', 'delFamily')
-    formData.append('idUser', idUserSelected)
     formData.append('id', idFamilyDel.value)
     const response = await executePost('src/php/db.php', formData) // script.js
-    //console.log(response)
-    if (response.success) {
+    //console.log(response) // # success:false|true, exception:<string>|null, result:null|true
+    if (response.success && response.result) {
         showStatusFamilyDel('La familia ha sido eliminada.', false) // form.js
         loadSelectFamilies() // reload families into combo
         setTimeout(() => {
@@ -281,9 +279,9 @@ formFamily.onsubmit = async (eve) => {
     // verificar si ya existe la family
     const description = formFamily.description.value.trim()
     const response = await executeGet('src/php/db.php?fn=isFamilyExists&idUser=' + idUserSelected + '&description=' + description + '&id=' + formFamily.id.value)
-    //console.log(response) // {success: false|true, exists: null|false|true}
+    //console.log(response) // {success: false|true, exception: <string>|null, result: null|false|true}
     if (response.success) {
-        if (!response.exists) {
+        if (!response.result) {
             formFamily.style.display = 'none'
             let formData = new FormData()
             formData.append('fn', 'addUpdateFamily')
@@ -291,8 +289,8 @@ formFamily.onsubmit = async (eve) => {
             formData.append('id', formFamily.id.value) // id=0 add, id>0 edit
             formData.append('description', description)
             const response = await executePost('src/php/db.php', formData)
-            //console.log(response) // {success: false|true}
-            if (response.success) {
+            //console.log(response) // {success:false|true, exception:<string>|null, result:null|true}
+            if (response.success && response.result) {
                 const txt = formFamily.id.value == '0' 
                     ? 'La nueva familia ha sido agregada.'
                     : 'La familia ha sido modificada.'
@@ -301,7 +299,7 @@ formFamily.onsubmit = async (eve) => {
                 // si fue una modificacion, tomar el id actual
                 let idCurrent = '0';
                 if (formFamily.id.value != '0') {
-                    idCurrent = form.family.options[form.family.selectedIndex].value
+                    idCurrent = form.idFamily.options[form.idFamily.selectedIndex].value
                     //console.log('id antes de modificar: ', idCurrent)
                 }
                 await loadSelectFamilies() // recargar familias en el combo
@@ -310,7 +308,7 @@ formFamily.onsubmit = async (eve) => {
                 if (formFamily.id.value == '0') {
                     let idMax = 0
                     let index = 0
-                    for (const option of form.family.options) {
+                    for (const option of form.idFamily.options) {
                         //console.log(option)
                         if (idMax < parseInt(option.value)) {
                             idMax = parseInt(option.value)
@@ -318,15 +316,15 @@ formFamily.onsubmit = async (eve) => {
                         }    
                     }
                     //console.log(index)
-                    form.family.selectedIndex = index
+                    form.idFamily.selectedIndex = index
                 }
                 // seleccionar el mismo value(id) antes de ser modificado
                 else {
                     //console.log('id a encontrar despues de modificar: ', idCurrent)
-                    for (const option of form.family.options) {
+                    for (const option of form.idFamily.options) {
                         if (option.value == idCurrent) {
                             //console.log('option.value=', option.value)
-                            form.family.selectedIndex = option.index
+                            form.idFamily.selectedIndex = option.index
                             break; 
                         }    
                     }
@@ -349,6 +347,7 @@ formFamily.onsubmit = async (eve) => {
         showStatusFamily() // form.js
 }
 
+// form add-edit article
 form.onsubmit = async (eve) => {
     eve.preventDefault()
     
@@ -358,11 +357,17 @@ form.onsubmit = async (eve) => {
     //console.log(code) 
     if (value.length > 0) {
         let response = await executeGet('src/php/db.php?fn=isCodeExists&idUser=' + idUserSelected + '&code=' + value + '&id=' + form.id.value) // id=0 para no encontrar ningun id igual
-        // codigo ya existe
-        if (response.success) 
-            showStatus('El código ya existe para...<br><b>' + response.description + '</b>.') // form.js
+        //console.log(response); // success:false|true, exception:<string>|null, result:null|false|{description:<value>} 
+        if (response.success) {
+            // codigo ya existe
+            if (response.result)
+                showStatus('El código ya existe para...<br><b>' + response.result.description + '</b>.') // form.js
+            else
+                isContinue = true
+        }
+        // error
         else
-            isContinue = true
+            showStatus()
     }
     else
         isContinue = true
@@ -373,12 +378,17 @@ form.onsubmit = async (eve) => {
         value = form.description.value.trim()
         //console.log(value)
         response = await executeGet('src/php/db.php?fn=isDescriptionExists&idUser=' + idUserSelected + '&description=' + value + '&id=' + form.id.value) // id=0 para no encontrar ningun id igual
-        //console.log(response)
-        // codigo ya existe
-        if (response.success) 
-            showStatus('La descripción ya existe.') // form.js
+        //console.log(response) // success:false|true, exception:<string>|null, result:null|false|true
+        if (response.success) {
+            // codigo ya existe
+            if (response.result)
+                showStatus('La descripción ya existe.') // form.js
+            else
+                isContinue = true  
+        }
+        // error
         else
-            isContinue = true        
+            showStatus()      
     }
 
     // descripcion no existe o es del mismo articulo a modificar
@@ -388,8 +398,8 @@ form.onsubmit = async (eve) => {
         formData.append('fn', 'addUpdateArticle')
         formData.append('idUser', idUserSelected)
         response = await executePost('src/php/db.php', formData) // script.js
-        //console.log(response) // {success: true}
-        if (response.success) {
+        //console.log('antes de guardar:', response) // success:false|true, exception:<string>|null, result:null|true
+        if (response.success && response.result) {
             const statusTxt = form.id.value == '0' 
                 ? 'El nuevo artículo se ha agregado.'
                 : 'El artículo ha sido modificado.' 

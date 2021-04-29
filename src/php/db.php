@@ -19,7 +19,7 @@ if (!empty($_GET) and isset($_GET['fn'])) {
             isDescriptionExists($_GET['idUser'], $_GET['description'], $_GET['id']);
             break;
         case 'getArticle':
-            getArticle($_GET['idUser'], $_GET['id']);
+            getArticle($_GET['id']);
             break;
         case 'getFamilies':
             getFamilies($_GET['idUser'], $_GET['idUser']);
@@ -51,16 +51,16 @@ else if (!empty($_POST) and isset($_POST['fn'])) {
             isUserExists($_POST['username'], $_POST['pass']);
             break;
         case 'addUpdateArticle':
-            addUpdateArticle($_POST['idUser'], intVal($_POST['id']), $_POST['code'], $_POST['description'], floatval($_POST['price']), $_POST['family']); # idUser, id, code, description, price, family
+            addUpdateArticle(); # en la funcion tomar $_POST
             break;
         case 'delArticle':
-            delArticle($_POST['idUser'], $_POST['id']);
+            delArticle($_POST['id']);
             break;
         case 'addUpdateFamily':
             addUpdateFamily($_POST['idUser'], $_POST['id'], $_POST['description']);
             break;
         case 'delFamily':
-            delFamily($_POST['idUser'], $_POST['id']);
+            delFamily($_POST['id']);
             break;
         case 'getUsersMinimal':
             getUsersMinimal();
@@ -274,17 +274,67 @@ function getUsersMinimal() {
     exit(json_encode($response));
 }
 
-##### articles
+##### families (all request of dashboard.js)
+
+function getFamilies($idUser) {
+    $sql = 'SELECT id, description FROM families WHERE id_user = ? ORDER BY description';
+    $params = array($idUser);
+    $response = Database::executeSql($sql, $params);
+    exit(json_encode($response));
+}
+
+function isFamilyExists($idUser, $description, $id) {
+    $sql = 'SELECT 1 FROM families WHERE id_user = ? AND description = ? AND id <> ?';
+    $params = array($idUser, $description, $id);
+    $response = Database::executeSql($sql, $params, false); # success:false|true, exception:<string>|null, result:null|false|{1:'1'}
+    if ($response['success'] and $response['result']) # si result no es false y contiene datos
+      $response['result'] = true;
+    exit(json_encode($response)); 
+}
+
+function addUpdateFamily($idUser, $id, $description) {
+    # add
+    if ($id == '0') {
+        $sql = 'INSERT INTO families(description, id_user) VALUES(?, ?)';
+        $params = array($description, $idUser);
+        $response = Database::executeSql($sql, $params); # success:false|true, exception:<string>|null, result:null|false
+        if ($response['success'])
+            $response['result'] = true;
+    }
+    # edit
+    else {
+        $sql = 'UPDATE families SET description = ? WHERE id = ?';
+        $params = array($description, $id);
+        $response = Database::executeSql($sql, $params); # success:false|true, exception:<string>|null, result:null|false
+        if ($response['success'])
+            $response['result'] = true;
+    }
+    exit(json_encode($response));
+}
+
+function delFamily($id) {
+    $sql = 'DELETE FROM families WHERE id = ?';
+    $params = array($id);
+    $response = Database::executeSql($sql, $params); # success:false|true, exception:<string>|null, result:null|false (false=sin datos, pero si exitoso)
+    if ($response['success'])
+        $response['result'] = true; # sustituir false(sin datos) x true(realizado)
+    exit(json_encode($response));
+}
+
+##### articles (all request of dashboard.js)
 
 function getArticles($idUser, $txt) {
-    $sql = 'SELECT id, description, price, code, family FROM articles WHERE id_user = ?';
+    $sql = 'SELECT a.id, a.description, a.price, a.code, f.description family 
+            FROM articles a
+            LEFT JOIN families f ON f.id = a.id_family
+            WHERE a.id_user = ?';
     $params = array($idUser);
     if (strlen($txt) > 0) {
-        $sql .= ' AND (description LIKE ? OR code LIKE ? OR family LIKE ?)';
+        $sql .= ' AND (a.description LIKE ? OR a.code LIKE ? OR f.description LIKE ?)';
         $txt = '%'.$txt.'%';
         $params = array($idUser, $txt, $txt, $txt);
     }
-    $sql .= ' ORDER BY description';
+    $sql .= ' ORDER BY a.description';
     $response = Database::executeSql($sql, $params);
     # convertir price str en float
     foreach ($response['result'] as $key=>$article) {
@@ -293,12 +343,58 @@ function getArticles($idUser, $txt) {
     exit(json_encode($response));
 }
 
-##### families
+function isCodeExists($idUser, $code, $id) {
+    $sql = 'SELECT description FROM articles WHERE id_user = ? AND code = ? AND id <> ?';
+    $params = array($idUser, $code, $id);
+    $response = Database::executeSql($sql, $params, false); # success:false|true, exception:<string>|null, result:null|false|{description:<description>} 
+    exit(json_encode($response));
+}
 
-function getFamilies($idUser) {
-    $sql = 'SELECT id, description FROM families WHERE id_user = ? ORDER BY description';
-    $params = array($idUser);
-    $response = Database::executeSql($sql, $params);
+function isDescriptionExists($idUser, $description, $id) {
+    $sql = 'SELECT 1 FROM articles WHERE id_user = ? AND description = ? AND id <> ?';
+    $params = array($idUser, $description, $id);
+    $response = Database::executeSql($sql, $params, false); # success:false|true, exception:<string>|null, result:null|false|{1:'1'} 
+    if ($response['success'] and $response['result']) # result false=no_existe, {1:'1'}=existe
+        $response['result'] = true;
+    exit(json_encode($response));
+}
+
+# tomar los parametros de $_POST (idUser, id, code, description, price, family)
+function addUpdateArticle() {
+    # add
+    if ($_POST['id'] == '0') {
+        $sql = 'INSERT INTO articles (description, price, code, id_family, id_user) VALUES (?, ?, ?, ?, ?)';
+        $params = array($_POST['description'], $_POST['price'], $_POST['code'], $_POST['idFamily'], $_POST['idUser']);
+        $response = Database::executeSql($sql, $params, false); # success:false|true, exception:<string>|null, result:null|false (false=sin datos, pero si exitoso) 
+        if ($response['success'])
+            $response['result'] = true; # sustituir false(sin datos) x true(realizado)
+    }
+    # edit
+    else {
+        $sql = 'UPDATE articles SET description = ?, price = ?, code = ?, id_family = ? WHERE id = ?';
+        $params = array($_POST['description'], $_POST['price'], $_POST['code'], $_POST['idFamily'], $_POST['id']);
+        $response = Database::executeSql($sql, $params, false); # success:false|true, exception:<string>|null, result:null|false (false=sin datos, pero si exitoso) 
+        if ($response['success'])
+            $response['result'] = true; # sustituir false(sin datos) x true(realizado)
+    }    
+    exit(json_encode($response));    
+}
+
+function getArticle($id) {
+    $sql = 'SELECT a.code, a.description, a.price, a.description, a.id_family 
+            FROM articles a 
+            WHERE a.id = ?';
+    $params = array($id);
+    $response = Database::executeSql($sql, $params, false); # success:false|true, exception:<string>|null, result:null|false|{object}
+    exit(json_encode($response));
+}
+
+function delArticle($id) {
+    $sql = 'DELETE FROM articles WHERE id = ?';
+    $params = array($id);
+    $response = Database::executeSql($sql, $params); # success:false|true, exception:<string>|null, result:null|false(sin datos pero exitoso)
+    if ($response['success'] and $response['result'])
+        $response['result'] = true; # false(sin datos) a true(exitoso)
     exit(json_encode($response));
 }
 
@@ -323,6 +419,7 @@ function saveFileUsers($users) {
 }
 */
 
+/*
 function getFileArticles($idUser) {
     $articlesPath = '../json/articles'.$idUser.'.json';    
     # si no existe, crearlo vacio
@@ -335,7 +432,9 @@ function saveFileArticles($idUser, $articles) {
     $articlesPath = '../json/articles'.$idUser.'.json';
     file_put_contents($articlesPath, json_encode($articles, JSON_PRETTY_PRINT));
 }
+*/
 
+/*
 function getFileFamilies($idUser) {
     $familiesPath = '../json/families'.$idUser.'.json';    
     # si no existe, crearlo vacio
@@ -343,12 +442,14 @@ function getFileFamilies($idUser) {
         file_put_contents($familiesPath, json_encode(array()));
     return json_decode(file_get_contents($familiesPath));    
 }
+*/
 
+/*
 function saveFileFamiles($idUser, $families) {
     $familiesPath = '../json/families'.$idUser.'.json';
     file_put_contents($familiesPath, json_encode($families, JSON_PRETTY_PRINT));
 }
-
+*/
 
 ##### users #####
 
@@ -602,6 +703,7 @@ function updatePass($id, $pass) {
 
 ##### articles #####
 
+/*
 function isCodeExists($idUser, $code, $id) {
     $response = array('success' => false, 'description' => null);
     $articles = getFileArticles($idUser);
@@ -618,7 +720,8 @@ function isCodeExists($idUser, $code, $id) {
     }
     exit(json_encode($response));
 }
-
+*/
+/*
 function isDescriptionExists($idUser, $description, $id) {
     $response = array('success' => false);
     $articles = getFileArticles($idUser);
@@ -631,7 +734,8 @@ function isDescriptionExists($idUser, $description, $id) {
     }    
     exit(json_encode($response));
 }
-
+*/
+/*
 function addUpdateArticle($idUser, $id, $code, $description, $price, $family) {
     $response = array('success' => false);
     $articles = getFileArticles($idUser);        
@@ -671,6 +775,7 @@ function addUpdateArticle($idUser, $id, $code, $description, $price, $family) {
     
     exit(json_encode($response));    
 }
+*/
 
 /*
 function getArticles($idUser, $txt) {
@@ -706,6 +811,7 @@ function getArticles($idUser, $txt) {
 }
 */
 
+/*
 function getArticle($idUser, $id) {
     $response = array('success' => false, 'article' => null);
     $articles = getFileArticles($idUser);
@@ -720,7 +826,9 @@ function getArticle($idUser, $id) {
     
     exit(json_encode($response));
 }
+*/
 
+/*
 function delArticle($idUser, $id) {
     $response = array('success' => false);
     $articles = getFileArticles($idUser);
@@ -734,9 +842,11 @@ function delArticle($idUser, $id) {
     }     
     exit(json_encode($response));
 }
+*/
 
 ##### families #####
 
+/*
 function _getFamilyDescription($idUser, $id) {
     $response = '';
     $families = getFileFamilies($idUser);
@@ -746,6 +856,7 @@ function _getFamilyDescription($idUser, $id) {
         $response = $families[$key]->description;    
     return $response;
 }
+*/
 
 /*
 function getFamilies($idUser) {
@@ -763,6 +874,7 @@ function getFamilies($idUser) {
     exit(json_encode($response));
 }*/
 
+/*
 function isFamilyExists($idUser, $description, $id) {
     $response = array('success' => false, 'exists' => null);
     $families = getFileFamilies($idUser);
@@ -777,8 +889,9 @@ function isFamilyExists($idUser, $description, $id) {
     }
     
     exit(json_encode($response)); 
-}
+}*/
 
+/*
 function addUpdateFamily($idUser, $id, $description) {
     $response = array('success' => false);
     $families = getFileFamilies($idUser);
@@ -821,7 +934,9 @@ function addUpdateFamily($idUser, $id, $description) {
     
     exit(json_encode($response));
 }
+*/
 
+/*
 function delFamily($idUser, $id) {
     $response = array('success' => false);    
         $families = getFileFamilies($idUser);
@@ -835,5 +950,6 @@ function delFamily($idUser, $id) {
         }     
     exit(json_encode($response));
 }
+*/
 
 ?>
