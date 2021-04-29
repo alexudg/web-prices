@@ -274,15 +274,31 @@ function getUsersMinimal() {
     exit(json_encode($response));
 }
 
+##### articles
+
 function getArticles($idUser, $txt) {
-    $sql = 'SELECT id, description, price, code, family, id_user FROM articles WHERE id_user = 2';
-    $params = array();
-    // if (strlen($txt) > 0) {
-    //     $sql .= ' AND (description LIKE ? OR code LIKE ? OR family LIKE ?)';
-    //     $txt = '%'.$txt.'%';
-    //     $params = array($idUser, $txt, $txt, $txt);
-    // }
-    $response = Database::executeSql($sql, $params); 
+    $sql = 'SELECT id, description, price, code, family FROM articles WHERE id_user = ?';
+    $params = array($idUser);
+    if (strlen($txt) > 0) {
+        $sql .= ' AND (description LIKE ? OR code LIKE ? OR family LIKE ?)';
+        $txt = '%'.$txt.'%';
+        $params = array($idUser, $txt, $txt, $txt);
+    }
+    $sql .= ' ORDER BY description';
+    $response = Database::executeSql($sql, $params);
+    # convertir price str en float
+    foreach ($response['result'] as $key=>$article) {
+        $response['result'][$key]['price'] += 0.0;        
+    } 
+    exit(json_encode($response));
+}
+
+##### families
+
+function getFamilies($idUser) {
+    $sql = 'SELECT id, description FROM families WHERE id_user = ? ORDER BY description';
+    $params = array($idUser);
+    $response = Database::executeSql($sql, $params);
     exit(json_encode($response));
 }
 
@@ -731,6 +747,7 @@ function _getFamilyDescription($idUser, $id) {
     return $response;
 }
 
+/*
 function getFamilies($idUser) {
     $response = array('success' => false, 'families' => null);
     $families = getFileFamilies($idUser); # si no existe se crea uno vacio
@@ -744,7 +761,7 @@ function getFamilies($idUser) {
     $response['families'] = $families;
     
     exit(json_encode($response));
-}
+}*/
 
 function isFamilyExists($idUser, $description, $id) {
     $response = array('success' => false, 'exists' => null);

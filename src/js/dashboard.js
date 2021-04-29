@@ -86,11 +86,10 @@ async function loadArticles() {
     if (searchText == '.')
         searchText = ''
     const response = await executeGet('src/php/db.php?fn=getArticles&idUser=' + idUserSelected + '&txt=' + searchText) // script.js
-    console.log(response) // {success: true | false, articles: [] | [{},{},...] | null}
-    return
+    //console.log(response) // success: false|true, exception: <string>|null, result: null|[]|[{},{},...]
     tbody.innerHTML = ''
     if (response.success) {
-        response.articles.forEach(article => {
+        response.result.forEach(article => {
             //console.log(article)
             tbody.innerHTML += `<tr>
                                     <td>${article.description}</td>
@@ -103,13 +102,13 @@ async function loadArticles() {
                                     </td>
                                 </tr>`
         });
-        countArticles.innerHTML = response.articles.length + ' artículo'
-        if (response.articles.length !== 1)
+        countArticles.innerHTML = response.result.length + ' artículo'
+        if (response.result.length !== 1)
             countArticles.innerHTML += 's'
         countArticles.innerHTML += ' encontrado'
-        if (response.articles.length !== 1)
+        if (response.result.length !== 1)
             countArticles.innerHTML += 's' 
-        countArticles.innerHTML += ' con el texto <b>' + searchArticle.value.trim() + '</b>'
+        countArticles.innerHTML += ' con "<b>' + searchArticle.value.trim() + '</b>"'
     }
     searchArticle.value = ''
 }
@@ -153,13 +152,13 @@ function closeModalAddEditFamily() {
 async function loadSelectFamilies() {
     // cargar familias en el combo
     const response = await executeGet('src/php/db.php?fn=getFamilies&idUser=' + idUserSelected)
-    //console.log(response) // {success: false|true, families: null|[{},{}]}
+    //console.log(response) // {success: false|true, exception: <string>|null, result: null|[]|[{},{}]}
     if (response.success) {
-        const visibility =  response.families.length > 0 ? 'visible' : 'hidden'
+        const visibility =  response.result.length > 0 ? 'visible' : 'hidden'
         btEditFamily.style.visibility = visibility
         btDelFamily.style.visibility = visibility
         form.family.innerHTML = ''
-        response.families.forEach(family => {
+        response.result.forEach(family => {
             form.family.innerHTML += `<option value="${family.id}">${family.description}</option>`
         })
     }    
