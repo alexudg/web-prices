@@ -7,8 +7,8 @@ form.onsubmit = async (eve) => {
         formData.append('id', form.id.value)
         formData.append('pass', form.pass.value)
         const response = await executePost(URL_SERVER, formData)
-        //console.log(response) // {success: false|true}
-        if (response.success) {
+        //console.log(response) // {success: false|true, exception:<string>|null, result:null|false|true}
+        if (response.success && response.result) {
             divForm.style.display = 'none'
             link.setAttribute('href', 'input.html')
             link.innerText = 'Ingresar'
@@ -39,10 +39,10 @@ window.onload = async () => {
         if (params.get('email') && params.get('token')) {
             // vefiricar si ambos corresponden (enviar la misma cadena de parametros con la funcion)
             const response = await executeGet(URL_SERVER + window.location.search + '&fn=isEmailTokenExists') // script.js
-            //console.log(response) // {success: false|true, id: null|<int>}
-            if (response.success) {
+            //console.log(response) // {success:false|true, exception:<string>|null, result:null|{id:<id>}}
+            if (response.success && response.result.id) {
                 // guardar el id de usuario
-                form.id.value = response.id
+                form.id.value = response.result.id
                 form.pass.focus()
             }
             else {

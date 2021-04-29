@@ -23,7 +23,7 @@ function updateSession(user, isChangeToken=false) {
 async function getUserData() {
     //console.log('token antes del request: ', localStorage.token)
     const response = await executeGet('src/php/db.php?fn=getUserData&token=' + localStorage.prices_token) 
-    console.log('getUserData response: ', response) // {success: false|true, exception:null|<string>, result:false|null|{id:<int>, username:<string>, email: <string>}  }
+    //console.log('getUserData response: ', response) // {success: false|true, exception:null|<string>, result:false|null|{id:<int>, username:<string>, email: <string>}  }
     if (response.success && response.result) {
         updateSession(response.result)        
     }

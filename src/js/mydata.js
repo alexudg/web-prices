@@ -76,7 +76,7 @@ form.onsubmit = async (eve) => {
         formData.append('email', form.email.value)
         formData.append('pass', form.pass.value) // ''=no cambiar
         const response = await executePost('src/php/db.php', formData)
-        console.log(response) // {success: false|true, exception:<string>|null, result: false|true}
+        //console.log(response) // {success: false|true, exception:<string>|null, result: false|true}
         if (response.success && response.result) {
             sectionForm.style.display = 'none'
             sessionStorage.prices_username = form.username.value

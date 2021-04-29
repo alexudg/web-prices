@@ -45,29 +45,33 @@ function delArticle(id, description) {
 
 // security by post
 async function loadUsersSelect() {
-    let formData = new FormData()
-    formData.append('fn', 'getUsers')
-    formData.append('idUser', idUserSelected)
-    const response = await executePost('src/php/db.php', formData)
-    //console.log(response) // { success: false|true, users: null | [{}] | [{},{},...] }
-
-    // fill select
-    selUsers.innerHTML = ''
-    response.users.forEach(user => {
-        //console.log(user)
-        selUsers.innerHTML +=  `<option value="${user.id}">${user.username}</option>`        
-    })
-    // if super-admin, select admin
-    if (sessionStorage.prices_id == '1') {
+    
+    // solo si es super-admin pedir lista de usuarios id-username
+    if (sessionStorage.prices_id === '1') {   
+        let formData = new FormData()
+        formData.append('fn', 'getUsersMinimal')
+        const response = await executePost('src/php/db.php', formData)
+        //console.log(response) // { success: false|true, exception:<string>|null, result:null | [{},{},...] }
+        // fill select
+        selUsers.innerHTML = '' // limpiar combo
+        response.result.forEach(user => {
+            //console.log(user)
+            selUsers.innerHTML +=  `<option value="${user.id}">${user.username}</option>`        
+        })
+        
+        // select super-admin    
         for (const option of selUsers.options) {
             if (option.value == '1') {
                 selUsers.selectedIndex = option.index
                 break;
             }
-        }
-    }    
-    else
+        }        
+    }
+    // solo el usuario loggeado
+    else {
+        selUsers.innerHTML = `<option value="${sessionStorage.prices_id}">${sessionStorage.prices_username}</option>`
         selUsers.style.visibility = 'hidden'    
+    }
 }
 
 function selUsersChange() {
@@ -82,7 +86,8 @@ async function loadArticles() {
     if (searchText == '.')
         searchText = ''
     const response = await executeGet('src/php/db.php?fn=getArticles&idUser=' + idUserSelected + '&txt=' + searchText) // script.js
-    //console.log('getArticles: ', response) // {success: true | false, articles: [] | [{},{},...] | null}
+    console.log(response) // {success: true | false, articles: [] | [{},{},...] | null}
+    return
     tbody.innerHTML = ''
     if (response.success) {
         response.articles.forEach(article => {

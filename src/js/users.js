@@ -62,8 +62,8 @@ async function okDel() {
         formData.append('fn', 'delUser')
         formData.append('id', idDel.value)
         const response = await executePost(URL_SERVER, formData)
-        //console.log(response)
-        if (response.success) {
+        //console.log(response) // success:false|true, exception:<string>|null, result:null|false|true
+        if (response.success && response.result) {
             showStatusDel('El usuario ha sido eliminado.', false)
             setTimeout(() => {
                 modalDel.click()

@@ -62,8 +62,8 @@ else if (!empty($_POST) and isset($_POST['fn'])) {
         case 'delFamily':
             delFamily($_POST['idUser'], $_POST['id']);
             break;
-        case 'getUsers':
-            getUsers($_POST['idUser']);
+        case 'getUsersMinimal':
+            getUsersMinimal();
             break;
         case 'isUserPass':
             isUserPass($_POST['id'], $_POST['pass']);
@@ -81,7 +81,7 @@ else if (!empty($_POST) and isset($_POST['fn'])) {
     exit();
 }
 
-##### sqlite #####
+########################## sqlite ############################
 
 class Database {
     static $db = null;
@@ -223,6 +223,14 @@ function isUsernameExists($username, $id) {
     exit(json_encode($response));
 }
 
+function delUser($id) {
+    $sql = 'DELETE FROM users WHERE id = ?';
+    $params = array($id);
+    $response = Database::executeSql($sql, $params, false); # success:false|true, exception:<string>|null, result:false
+    $response['result'] = true;
+    exit(json_encode($response));
+}
+
 function isEmailExists($email, $id) {
     $sql = 'SELECT 1 FROM users WHERE email = ? AND id <> ?';
     $params = array($email, $id);
@@ -231,8 +239,58 @@ function isEmailExists($email, $id) {
     exit(json_encode($response));
 }
 
+function getNewTokenUser($email) {
+    # generar token
+    $token = '';
+    for ($i=0; $i < 8; $i++)
+        $token .= dechex(rand(0, 15));
+    # guardar token
+    $sql = 'UPDATE users SET token = ? WHERE email = ?';
+    $params = array($token, $email);
+    $response = Database::executeSql($sql, $params, false);
+    $response['result'] = $token;    
+    exit(json_encode($response));
+}
+
+function isEmailTokenExists($email, $token) {
+    $sql = 'SELECT id FROM users WHERE email = ? AND token = ?';
+    $params = array($email, $token);
+    $response = Database::executeSql($sql, $params, false); # success:false|true, exception:<string>|null, result:null|{'id':<id>}
+    exit(json_encode($response));
+}
+
+function updatePass($id, $pass) {
+    $pass = password_hash($pass, PASSWORD_BCRYPT);
+    $sql = 'UPDATE users SET pass = ? WHERE id = ?';
+    $params = array($pass, $id);
+    $response = Database::executeSql($sql, $params, false); # success:false|true, exception:<string>|null, result:null|false
+    $response['result'] = true;
+    exit(json_encode($response));
+}
+
+function getUsersMinimal() {
+    $sql = 'SELECT id, username FROM users ORDER BY username';
+    $response = Database::executeSql($sql); # todos usuarios id-username
+    exit(json_encode($response));
+}
+
+function getArticles($idUser, $txt) {
+    $sql = 'SELECT id, description, price, code, family, id_user FROM articles WHERE id_user = 2';
+    $params = array();
+    // if (strlen($txt) > 0) {
+    //     $sql .= ' AND (description LIKE ? OR code LIKE ? OR family LIKE ?)';
+    //     $txt = '%'.$txt.'%';
+    //     $params = array($idUser, $txt, $txt, $txt);
+    // }
+    $response = Database::executeSql($sql, $params); 
+    exit(json_encode($response));
+}
+
+######################### JSON ################################
+
 ##### files #####
 
+/*
 function getFileUsers() {
     $usersPath = '../json/users.json';    
     # si no existe, crear usuario default admin:1
@@ -247,6 +305,7 @@ function saveFileUsers($users) {
     $usersPath = '../json/users.json';
     file_put_contents($usersPath, json_encode($users, JSON_PRETTY_PRINT));
 }
+*/
 
 function getFileArticles($idUser) {
     $articlesPath = '../json/articles'.$idUser.'.json';    
@@ -364,6 +423,7 @@ function isEmailExists($email, $id) {
     exit(json_encode($response));
 }*/
 
+/*
 function getUsers($idUser) {
     $response = array('success'=>false, 'users'=>null);
     $users = getFileUsers();
@@ -390,7 +450,7 @@ function getUsers($idUser) {
     $response['users'] = $usersSend;    
 
     exit(json_encode($response));
-}
+}*/
 
 /*
 function getUsersData() {
@@ -456,6 +516,7 @@ function addUpdateUserData() {
 }
 */
 
+/*
 function delUser($id) {
     $users = getFileUsers();
     $ids = array_column($users, 'id'); # array of id's
@@ -468,8 +529,9 @@ function delUser($id) {
         saveFileUsers($users);
     }
     exit(json_encode(array('success'=>true)));
-}
+}*/
 
+/*
 function getNewTokenUser($email) {
     $response = array('success'=>false, 'token'=>null);
     $users = getFileUsers();
@@ -486,8 +548,9 @@ function getNewTokenUser($email) {
         $response['token'] = $token;    
     }
     exit(json_encode($response));
-}
+}*/
 
+/*
 function isEmailTokenExists($email, $token) {
     $response = array('success'=>false, 'id'=>null);
     $users = getFileUsers();
@@ -501,8 +564,9 @@ function isEmailTokenExists($email, $token) {
             $response['id'] = $users[$key]->id; # retornar id
     }
     exit(json_encode($response));
-}
+}*/
 
+/*
 function updatePass($id, $pass) {
     $response = array('success'=>false);
     $users = getFileUsers();
@@ -518,7 +582,7 @@ function updatePass($id, $pass) {
         $response['success'] = true;
     }
     exit(json_encode($response));
-}
+}*/
 
 ##### articles #####
 
@@ -592,6 +656,7 @@ function addUpdateArticle($idUser, $id, $code, $description, $price, $family) {
     exit(json_encode($response));    
 }
 
+/*
 function getArticles($idUser, $txt) {
     $response = array('success' => false, 'articles' => null);        
     $articles = getFileArticles($idUser); # si no existia se creo uno vacio
@@ -623,6 +688,7 @@ function getArticles($idUser, $txt) {
         
     exit(json_encode($response));
 }
+*/
 
 function getArticle($idUser, $id) {
     $response = array('success' => false, 'article' => null);
