@@ -40,8 +40,8 @@ form.onsubmit = async (eve) => {
         formData.append('id', sessionStorage.prices_id)
         formData.append('pass', form.passOld.value)
         const response = await executePost('src/php/db.php', formData) // script.js
-        //console.log(response) // {success: false|true}
-        if (response.success)
+        //console.log(response) // {success: false|true, exception: <string>|null, result:null|false|true}
+        if (response.success && response.result)
             isContinue = true
         else {
             passClear()
@@ -77,7 +77,7 @@ form.onsubmit = async (eve) => {
         formData.append('pass', form.pass.value) // ''=no cambiar
         const response = await executePost('src/php/db.php', formData)
         console.log(response) // {success: false|true, exception:<string>|null, result: false|true}
-        if (response.success) {
+        if (response.success && response.result) {
             sectionForm.style.display = 'none'
             sessionStorage.prices_username = form.username.value
             sessionStorage.prices_email = form.email.value

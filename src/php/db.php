@@ -65,9 +65,9 @@ else if (!empty($_POST) and isset($_POST['fn'])) {
         case 'getUsers':
             getUsers($_POST['idUser']);
             break;
-        //case 'isUserPass':
-            //isUserPass($_POST['id'], $_POST['pass']);
-            //break;
+        case 'isUserPass':
+            isUserPass($_POST['id'], $_POST['pass']);
+            break;
         case 'addUpdateUserData':
             addUpdateUserData(); # se utiliza $_POST
             break;
@@ -143,7 +143,7 @@ function isUserExists($username, $pass) {
     
     # si el username existe
     if ($response['result']) {
-        # pass identico
+        # pass OK
         if (password_verify($pass, $response['result']['pass'])) {
             unset($response['result']['pass']); # quitar pass
             # generar token y guardarlo
@@ -198,6 +198,39 @@ function addUpdateUserData() {
     exit(json_encode($response));
 }
 
+function isUserPass($id, $pass) {
+    $sql = 'SELECT pass FROM users WHERE id = ?';
+    $params = array($id);
+    $response = Database::executeSql($sql, $params, false); # success: false|true, exception:<string>|null, result:null|<pass_hash> 
+    if (isset($response['result']['pass'])) {
+        $response['result'] = password_verify($pass, $response['result']['pass']);
+        unset($response['result']['pass']); # quitar pass
+    }        
+    exit(json_encode($response));
+}
+
+function getUsersData() {
+    $sql = 'SELECT id, username, email FROM users ORDER BY username';
+    $response = Database::executeSql($sql);    
+    exit(json_encode($response));
+}
+
+function isUsernameExists($username, $id) {
+    $sql = 'SELECT 1 FROM users WHERE username = ? AND id <> ?';
+    $params = array($username, $id);
+    $response = Database::executeSql($sql, $params);
+    $response['result'] = count($response['result']) > 0;
+    exit(json_encode($response));
+}
+
+function isEmailExists($email, $id) {
+    $sql = 'SELECT 1 FROM users WHERE email = ? AND id <> ?';
+    $params = array($email, $id);
+    $response = Database::executeSql($sql, $params);
+    $response['result'] = count($response['result']) > 0;
+    exit(json_encode($response));
+}
+
 ##### files #####
 
 function getFileUsers() {
@@ -240,6 +273,7 @@ function saveFileFamiles($idUser, $families) {
     $familiesPath = '../json/families'.$idUser.'.json';
     file_put_contents($familiesPath, json_encode($families, JSON_PRETTY_PRINT));
 }
+
 
 ##### users #####
 
@@ -303,6 +337,7 @@ function getUserData($token) {
     exit(json_encode($response));    
 }*/
 
+/*
 function isUsernameExists($username, $id) {
     $response = array('success'=>false);
     $users = getFileUsers();
@@ -314,7 +349,9 @@ function isUsernameExists($username, $id) {
             $response['success'] = true;
     exit(json_encode($response));
 }
+*/
 
+/*
 function isEmailExists($email, $id) {
     $response = array('success'=>false);
     $users = getFileUsers();
@@ -325,7 +362,7 @@ function isEmailExists($email, $id) {
         if ($users[$key]->id != $id) # ya lo tiene otro usuario
             $response['success'] = true;
     exit(json_encode($response));
-}
+}*/
 
 function getUsers($idUser) {
     $response = array('success'=>false, 'users'=>null);
@@ -355,6 +392,7 @@ function getUsers($idUser) {
     exit(json_encode($response));
 }
 
+/*
 function getUsersData() {
     $result = array('success'=>false);
     $users = getFileUsers();
@@ -377,6 +415,7 @@ function getUsersData() {
     $result['users'] = $usersSend;
     exit(json_encode($result));
 }
+*/
 
 /*
 function addUpdateUserData() {

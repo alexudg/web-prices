@@ -50,7 +50,6 @@ btCloseStatusDel.onclick = () => {
     statusDelArea.style.display = 'none'
 }
 
-
 function cancelAddEdit() {
     modalAddEdit.click() // se crea param eve
 }
@@ -110,26 +109,36 @@ form.onsubmit = async (eve) => {
     
     // username existe?
     const response = await executeGet(URL_SERVER + '?fn=isUsernameExists&username=' + form.username.value + '&id=' + form.id.value)
-    //console.log(response) // {success: false|true}
+    //console.log(response) // success: false|true, except:<string>|null, result:null|false|true
     let isContinue = false
     if (response.success) {
-        showStatus('El nombre de usuario ya existe.') // form.js
-        form.username.focus()        
-    }
-    else
-        isContinue = true
-    // email existe?
-    if (isContinue) {
-        isContinue = false
-        const response = await executeGet(URL_SERVER + '?fn=isEmailExists&email=' + form.email.value + '&id=' + form.id.value)
-        //console.log(response) // {success: false|true}
-        if (response.success) {
-            showStatus('El correo ya existe.') // form.js
-            form.email.focus()
+        if (response.result) {
+            showStatus('El nombre de usuario ya existe.') // form.js
+            form.username.focus() 
         }
         else
             isContinue = true
     }
+    else
+        showStatus() // form.js
+    
+    // email existe?
+    if (isContinue) {
+        isContinue = false
+        const response = await executeGet(URL_SERVER + '?fn=isEmailExists&email=' + form.email.value + '&id=' + form.id.value)
+        //console.log(response) // success: false|true, except:<string>|null, result:null|false|true
+        if (response.success) {
+            if (response.result) {
+                showStatus('El correo ya existe.') // form.js
+                form.email.focus()
+            }
+            else
+                isContinue = true
+        }
+        else
+            showStatus() // form.js
+    }
+    
     // password
     if (isContinue) {
         isContinue = false
@@ -156,8 +165,8 @@ form.onsubmit = async (eve) => {
         formData.append('email', form.email.value)
         formData.append('pass', form.pass.value) // ''=no cambiar, sino cambiarla
         const response = await executePost(URL_SERVER, formData)
-        //console.log(response)
-        if (response.success) {            
+        //console.log(response) // success:false|true, exception:<string>|null, result:null|false|true
+        if (response.success && response.result) {            
             const txt = form.id.value == '0' 
                 ? 'El nuevo usuario ha sido agregado.'
                 : 'El usuario ha sido modificado.'
@@ -177,10 +186,10 @@ form.onsubmit = async (eve) => {
 
 async function loadUsers() {
     const response = await executeGet(URL_SERVER + '?fn=getUsersData') // script.js
-    //console.log(response) // {success: false|true, users: null | [{},...] }
+    //console.log(response) // success:false|true,exception:<string>|null,result:null|{id:<val>,username:<val>,email:<val>} * existentes
     if (response.success) {
         tbody.innerHTML = ''
-        response.users.forEach(users => {
+        response.result.forEach(users => {
             //console.log(users)
             tbody.innerHTML += `<tr>
                                     <td>${users.id}</td>
@@ -192,11 +201,11 @@ async function loadUsers() {
                                     </td>
                                 </tr>`
         });
-        countUsers.innerHTML = response.users.length + ' usuario'
-        if (response.users.length !== 1)
+        countUsers.innerHTML = response.result.length + ' usuario'
+        if (response.result.length !== 1)
             countUsers.innerHTML += 's'
         countUsers.innerHTML += ' encontrado'
-        if (response.users.length !== 1)
+        if (response.result.length !== 1)
             countUsers.innerHTML += 's'
     }
 }
