@@ -88,6 +88,7 @@ async function loadArticles() {
         searchText = ''
     const response = await executeGet('src/php/db.php?fn=getArticles&idUser=' + idUserSelected + '&txt=' + searchText) // script.js
     //console.log(response) // success: false|true, exception: <string>|null, result: null|[]|[{},{},...]
+    
     tbody.innerHTML = ''
     if (response.success) {
         response.result.forEach(article => {

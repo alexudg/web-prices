@@ -324,24 +324,29 @@ function delFamily($id) {
 ##### articles (all request of dashboard.js)
 
 function getArticles($idUser, $txt) {
-    $sql = 'SELECT a.id, a.description, a.price, a.cost, a.code, f.description family 
-            FROM articles a
-            LEFT JOIN families f ON f.id = a.id_family
-            WHERE a.id_user = ?';
+    # consulta a vista indexada
+    $sql = 'SELECT id, description, price, cost, code, family 
+            FROM v_articles 
+            WHERE id_user = ?';
     $params = array($idUser);
+        
+    # busqueda por texto
     if (strlen($txt) > 0) {
-        $sql .= ' AND (a.description LIKE ? OR a.code LIKE ? OR f.description LIKE ?)';
+        $sql .= ' AND (description LIKE ? OR code LIKE ? OR family LIKE ?)';
+        # quitar acentos
+        $txt = utf8_encode(strtr(utf8_decode($txt), utf8_decode('áéíóúÁÉÍÓÚ'), 'aeiouAEIOU'));
         $txt = '%'.$txt.'%';
-        $params = array($idUser, $txt, $txt, $txt);
+        array_push($params, $txt, $txt, $txt);
     }
-    $sql .= ' ORDER BY a.description';
     $response = Database::executeSql($sql, $params);
-    # convertir price str en float
+    
+    # convertir price-cost str en float
     foreach ($response['result'] as $key=>$article) {
         $response['result'][$key]['price'] += 0.0;
+        # si cost no es null, convertirlo de texto a float
         if ($response['result'][$key]['cost'])
             $response['result'][$key]['cost'] += 0.0;       
-    } 
+    }
     exit(json_encode($response));
 }
 
@@ -363,6 +368,9 @@ function isDescriptionExists($idUser, $description, $id) {
 
 # tomar los parametros de $_POST (idUser, id, code, description, price, family)
 function addUpdateArticle() {
+    # quitarle los acentos a descripcion respetando la ñ
+    $_POST['description'] = utf8_encode(strtr(utf8_decode($_POST['description']), utf8_decode('áéíóúÁÉÍÓÚ'), 'aeiouAEIOU'));
+    # costo vacio o cero pasarlo a null
     if (strlen($_POST['cost']) == 0 or floatval($_POST['cost']) == 0)
         $_POST['cost'] = null;
     # add
