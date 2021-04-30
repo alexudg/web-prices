@@ -19,6 +19,7 @@ async function editArticle(id) {
         form.code.value = response.result.code
         form.description.value = response.result.description
         form.price.value = response.result.price
+        form.cost.value = response.result.cost
         await loadSelectFamilies()
 
         // seleccionar su familia
@@ -91,9 +92,11 @@ async function loadArticles() {
     if (response.success) {
         response.result.forEach(article => {
             //console.log(article)
+            const cost = article.cost == null ? '' : '$' + article.cost.toFixed(2)
             tbody.innerHTML += `<tr>
                                     <td>${article.description}</td>
                                     <td class="price">$${article.price.toFixed(2)}</td>
+                                    <td class="cost">${cost}</td>
                                     <td>${article.code}</td>
                                     <td>${article.family}</td>
                                     <td>

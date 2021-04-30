@@ -78,8 +78,13 @@ table button:hover {
     cursor: pointer;
 }
 
-.price {
+.price,
+.cost {
     text-align: right;
+}
+
+.cost {
+    color: gray;
 }
 
 table > tbody > tr {

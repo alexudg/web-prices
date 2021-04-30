@@ -27,6 +27,7 @@
                 <tr>
                     <th>Artículo</th>
                     <th>Precio</th>
+                    <th>Costo</th>
                     <th>Código</th>
                     <th>Familia</th>
                     <th>Acciones</th>
@@ -37,7 +38,7 @@
             </tbody>
             <tfoot> 
                 <tr>
-                    <td id="username" colspan="1"></td>
+                    <td id="username" colspan="2"></td>
                     <td colspan="4" id="countArticles"></td>
                 </tr>
             </tfoot>    
@@ -50,6 +51,7 @@
                     <input type="text" name="code" placeholder="Código">
                     <input type="text" name="description" placeholder="*Descripción" required>
                     <input type="number" name="price" step="0.01" placeholder="*Precio" required>
+                    <input type="number" name="cost" step="0.01" placeholder="Costo">
                     <label for="selFamilies">*Familia</label>
                     <div class="form__families">
                         <select name="idFamily" required>
