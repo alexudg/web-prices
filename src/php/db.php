@@ -332,9 +332,10 @@ function getArticles($idUser, $txt) {
         
     # busqueda por texto
     if (strlen($txt) > 0) {
-        $sql .= ' AND (description LIKE ? OR code LIKE ? OR family LIKE ?)';
+        $sql .= ' AND (REPLACE(description, "ñ", "Ñ") LIKE ? OR code LIKE ? OR family LIKE ?)';
         # quitar acentos
-        $txt = utf8_encode(strtr(utf8_decode($txt), utf8_decode('áéíóúÁÉÍÓÚ'), 'aeiouAEIOU'));
+        $txt = utf8_encode(strtr(utf8_decode($txt), utf8_decode('áéíóúÁÉÍÓÚñ'), utf8_decode('aeiouAEIOUÑ')));
+        
         $txt = '%'.$txt.'%';
         array_push($params, $txt, $txt, $txt);
     }
