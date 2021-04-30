@@ -74,8 +74,8 @@ else if (!empty($_POST) and isset($_POST['fn'])) {
         case 'delUser':
             delUser($_POST['id']);
             break;
-        case 'updatePass':
-            updatePass($_POST['id'], $_POST['pass']);
+        case 'passRenew':
+            passRenew($_POST['id'], $_POST['pass']);
             break;
     }
     exit();
@@ -259,9 +259,10 @@ function isEmailTokenExists($email, $token) {
     exit(json_encode($response));
 }
 
-function updatePass($id, $pass) {
+# renovar contraseña 
+function passRenew($id, $pass) {
     $pass = password_hash($pass, PASSWORD_BCRYPT);
-    $sql = 'UPDATE users SET pass = ? WHERE id = ?';
+    $sql = 'UPDATE users SET pass = ?, token = "" WHERE id = ?';
     $params = array($pass, $id);
     $response = Database::executeSql($sql, $params, false); # success:false|true, exception:<string>|null, result:null|false
     $response['result'] = true;

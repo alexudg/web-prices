@@ -3,10 +3,10 @@ form.onsubmit = async (eve) => {
     // vefiry pass equals
     if (form.pass.value == form.confirm.value) {
         let formData = new FormData()
-        formData.append('fn', 'updatePass')
+        formData.append('fn', 'passRenew')
         formData.append('id', form.id.value)
         formData.append('pass', form.pass.value)
-        const response = await executePost(URL_SERVER, formData)
+        const response = await executePost(URL_SERVER, formData) // renovar contraseña y eliminar token
         //console.log(response) // {success: false|true, exception:<string>|null, result:null|false|true}
         if (response.success && response.result) {
             divForm.style.display = 'none'
@@ -25,9 +25,10 @@ form.onsubmit = async (eve) => {
     }
 }
 
+divForm.style.display = 'none' // iniciar con formulario oculto
+
 window.onload = async () => {
     //console.log('passrenew.js')
-    
     // parametros: ?email=alexudg@gmail.com&token=4aeb31e3
     if (!window.location.search)
         window.location.href = 'input.html'
@@ -44,9 +45,9 @@ window.onload = async () => {
                 // guardar el id de usuario
                 form.id.value = response.result.id
                 form.pass.focus()
+                divForm.style.display = 'block' // show form
             }
             else {
-                divForm.style.display = 'none' // hidden form
                 showStatus('La liga no es válida para renovar tu contraseña, solicita un <b>nuevo correo</b> aqui abajo en "<b>Olvidé mi contraseña</b>".')
             }
         }  
