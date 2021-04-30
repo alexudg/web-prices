@@ -1,5 +1,5 @@
-console.log('localStorage.prices_token:', localStorage.prices_token)
-console.log('sessionStorage:', sessionStorage)
+//console.log('localStorage.prices_token:', localStorage.prices_token)
+//console.log('sessionStorage:', sessionStorage)
 
 // header
 let html = `<a href="index.html"><img src="src/img/logo300x185px.png" alt="Logotipo"></a>
