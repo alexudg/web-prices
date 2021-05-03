@@ -41,15 +41,23 @@ table input[type=search] {
 
 table > caption > button {
     background-color: lightgreen; 
+    width: 100px;
     position: absolute;
     left: 130px;   
-    top: 5px;
+    top: 5px; 
+    display: flex; 
+    justify-content: space-around;
+    align-items: center;  
+}
+
+table > caption > button {
+    font-size: 13pt;
 }
 
 table > caption > span {
     font-size: 16pt;
     position: absolute;
-    left: 180px;
+    left: 250px;
     top: 10px;
 }
 
