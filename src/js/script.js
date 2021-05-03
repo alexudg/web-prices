@@ -75,7 +75,7 @@ html +=        `</nav>
                 </div>
             </div>
         </section>
-        <h5>Derechos y recursos reservados Pla<b>net</b>&reg; sistemas <span id="year">2000</span>.</h5>`
+        <p>Derechos y recursos reservados Pla<b>net</b> Sistemas&reg; <span id="year">2000</span>.</p>`
 
 document.getElementsByTagName('footer')[0].innerHTML = html
 

@@ -115,6 +115,8 @@ async function loadArticles() {
         countArticles.innerHTML += ' con "<b>' + searchArticle.value.trim() + '</b>"'
     }
     searchArticle.value = ''
+    // si el body es mayor al port-view vertical, mostrar flecha arriba
+    arrowUp.style.display = document.body.clientHeight > window.innerHeight ? 'inherit' : 'none'
 }
 
 function addFamily(event) {
@@ -432,6 +434,6 @@ window.onload = async () => {
         await loadUsersSelect() 
         idUserSelected = selUsers.options[selUsers.selectedIndex].value     
         // searchArticle.value = '*'
-        // loadArticles()  
+        // loadArticles()                
     }    
 } 

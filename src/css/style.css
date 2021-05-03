@@ -177,8 +177,9 @@ footer nav > a {
     margin: 3px 8px;
 }
 
-footer > h5 {
+footer > p {
     text-align: center;
+    font-size: 9pt;
 }
 
 a.active {
