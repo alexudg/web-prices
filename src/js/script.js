@@ -2,7 +2,7 @@
 //console.log('sessionStorage:', sessionStorage)
 
 // header
-let html = `<a href="index.html"><img src="src/img/logo300x185px.png" alt="Logotipo"></a>
+let html = `<a href="index.html"><img src="src/img/logo139x80px.png" alt="Logotipo"></a>
         <span>Checador de precios</span>
         <nav class="navMain">
             <a href="index.html" id="btIndex">Inicio</a>`
