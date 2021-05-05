@@ -9,13 +9,13 @@ function addArticle() {
     form.code.focus()
 }
 
-async function editArticle(id) {
+async function editArticle(id, copy=false) {
     // solicitud de datos del articulo
     const response = await executeGet('src/php/db.php?fn=getArticle&id=' + id)
     //console.log(response) // success:false|true, exception:<string>|null, result:null|false|{object}
     if (response.success && response.result) {
-        formTitle.innerText = 'Modificar artículo'
-        form.id.value = id
+        formTitle.innerText = copy ? 'Agregar artículo' : 'Modificar artículo'
+        form.id.value = copy ? '0' : id // si es clon, id sera cero para agregar
         form.code.value = response.result.code
         form.description.value = response.result.description
         form.price.value = response.result.price
@@ -102,6 +102,7 @@ async function loadArticles() {
                                     <td>${article.family}</td>
                                     <td>
                                         <button class="bt-edit" onclick="editArticle(${article.id})"><img src="src/img/edit24px.png" alt="Editar" title="Editar"></button>
+                                        <button class="bt-edit" onclick="editArticle(${article.id}, true)"><img src="src/img/copy24px.png" alt="Clonar" title="Clonar"></button>
                                         <button class="bt-del" onclick="delArticle(${article.id}, '${article.description}')"><img src="src/img/trash24px.png" alt="Eliminar" title="Eliminar"></button>
                                     </td>
                                 </tr>`
