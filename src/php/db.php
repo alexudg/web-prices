@@ -80,6 +80,45 @@ else if (!empty($_POST) and isset($_POST['fn'])) {
     }
     exit();
 }
+###### solicitud JSON desde movil #####
+else if (!empty(file_get_contents('php://input'))) {
+    $post = json_decode(file_get_contents('php://input'));
+    //echo json_encode($post->fn);
+    switch ($post->fn) {
+        case 'isUserExists':
+            isUserExists($post->username, $post->pass);
+            break;
+        case 'addUpdateArticle':
+            addUpdateArticleJson($post); # en la funcion tomar $post
+            // fn, description, price, cost, code, idFamily, idUser, id
+            break;
+        case 'delArticle':
+            delArticle($post->id);
+            break;
+        case 'addUpdateFamily':
+            addUpdateFamily($post->idUser, $post->id, $post->description);
+            break;
+        case 'delFamily':
+            delFamily($post->id);
+            break;
+        case 'getUsersMinimal':
+            getUsersMinimal();
+            break;
+        case 'isUserPass':
+            isUserPass($post->id, $post->pass);
+            break;
+        case 'addUpdateUserData':
+            addUpdateUserData(); # se utiliza $_POST
+            break;
+        case 'delUser':
+            delUser($post->id);
+            break;
+        case 'passRenew':
+            passRenew($post->id, $post->pass);
+            break;
+    }
+    exit();
+}
 
 ########################## sqlite ############################
 
@@ -387,6 +426,32 @@ function addUpdateArticle() {
     else {
         $sql = 'UPDATE articles SET description = ?, price = ?, cost = ?, code = ?, id_family = ? WHERE id = ?';
         $params = array($_POST['description'], $_POST['price'], $_POST['cost'], $_POST['code'], $_POST['idFamily'], $_POST['id']);
+        $response = Database::executeSql($sql, $params, false); # success:false|true, exception:<string>|null, result:null|false (false=sin datos, pero si exitoso) 
+        if ($response['success'])
+            $response['result'] = true; # sustituir false(sin datos) x true(realizado)
+    }    
+    exit(json_encode($response));    
+}
+
+### misma funcion que la anterior pero solo para JSON, desde movil
+function addUpdateArticleJson($post) {
+    # quitarle los acentos a descripcion respetando la ñ
+    $post->description = utf8_encode(strtr(utf8_decode($post->description), utf8_decode('áéíóúÁÉÍÓÚ'), 'aeiouAEIOU'));
+    # costo vacio o cero pasarlo a null
+    if (strlen($post->cost) == 0 or floatval($post->cost) == 0)
+        $post->cost = null;
+    # add
+    if ($post->id == '0') {
+        $sql = 'INSERT INTO articles (description, price, cost, code, id_family, id_user) VALUES (?, ?, ?, ?, ?, ?)';
+        $params = array($post->description, $post->price, $post->cost, $post->code, $post->idFamily, $post->idUser);
+        $response = Database::executeSql($sql, $params, false); # success:false|true, exception:<string>|null, result:null|false (false=sin datos, pero si exitoso) 
+        if ($response['success'])
+            $response['result'] = true; # sustituir false(sin datos) x true(realizado)
+    }
+    # edit
+    else {
+        $sql = 'UPDATE articles SET description = ?, price = ?, cost = ?, code = ?, id_family = ? WHERE id = ?';
+        $params = array($post->description, $post->price, $post->cost, $post->code, $post->idFamily, $post->id);
         $response = Database::executeSql($sql, $params, false); # success:false|true, exception:<string>|null, result:null|false (false=sin datos, pero si exitoso) 
         if ($response['success'])
             $response['result'] = true; # sustituir false(sin datos) x true(realizado)
