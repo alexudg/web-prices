@@ -142,7 +142,7 @@ class Database {
     } 
     
     static function executeSql($sql, $params=null, $all=true) {
-        $response = array('success'=>false, 'exception'=>null, 'result'=>null);
+        $response = array('success'=>false, 'exception'=>'', 'result'=>null);
         try {
             if (self::$db == null)
                 self::loadDatabase();
@@ -180,7 +180,7 @@ function isUserExists($username, $pass) {
     $params = array($username);
     $response = Database::executeSql($sql, $params, false); # result: false|{id: <int>, pass: <str_hash>}
     
-    # si el username existe
+    # si el username existe, result: {id:<int>, pass:<str_hash>}
     if ($response['result']) {
         # pass OK
         if (password_verify($pass, $response['result']['pass'])) {
@@ -196,8 +196,10 @@ function isUserExists($username, $pass) {
             $response['result']['token'] = $token; # agregar token
         }
         else
-            $response['result'] = false;    
+            $response['result'] = null;    
     }
+    else
+        $response['result'] = null;
     exit(json_encode($response));
 }
 

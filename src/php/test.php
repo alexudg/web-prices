@@ -1,8 +1,10 @@
 <?php
   if (!empty($_GET))
-    echo '"GET":true';
+    echo '"method":"GET"';
+  // flutter envia como formulario  
   else if (!empty($_POST))
-    echo '"POST":true';
+    echo '"method":"POST"';
+  // client REST de VSCode envia como JSON  
   else if (!empty(file_get_contents('php://input'))) 
-    echo '"POST_JSON":true'; 
+    echo '"method":"POST_JSON"'; 
 ?>
