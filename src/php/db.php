@@ -22,7 +22,7 @@ if (!empty($_GET) and isset($_GET['fn'])) {
             getArticle($_GET['id']);
             break;
         case 'getFamilies':
-            getFamilies($_GET['idUser'], $_GET['idUser']);
+            getFamilies($_GET['idUser']);
             break;
         case 'isFamilyExists':
             isFamilyExists($_GET['idUser'], $_GET['description'], $_GET['id']);
@@ -150,7 +150,8 @@ class Database {
             $sta->execute($params);
             $result = $all ? $sta->fetchAll() : $sta->fetch();
             $response['success'] = true;
-            $response['result'] = $result;
+            if ($result)
+              $response['result'] = $result;
         }
         catch (Exception $e) {
             $response['exception'] = $e->getMessage();
@@ -204,7 +205,7 @@ function isUserExists($username, $pass) {
 }
 
 function getUserData($token) {
-    $sql = 'SELECT id, username, email FROM users WHERE token = ?';
+    $sql = 'SELECT id, username, email, token FROM users WHERE token = ?';
     $params = array($token);
     $response = Database::executeSql($sql, $params, false); # success:false|true, exception:<string>|null, result:null|false|{id:<val>, username:<val>, email:<val>}
     exit(json_encode($response));
