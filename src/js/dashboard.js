@@ -1,17 +1,35 @@
 let searchText = ''
 let idUserSelected = sessionStorage.prices_id
 
-function addArticle() {
-    formTitle.innerText = 'Agregar artículo'
-    form.id.value = '0' // 0=agregar
-    loadSelectFamilies()
-    modal.style.display = 'flex'
-    form.code.focus()
+async function addArticle() {
+    let isContinue = false;
+
+    /// verify if user is 'pruebas'
+    if (sessionStorage.prices_id == '0') {
+        /// 10 articles max 
+        const res = await executeGet(`src/php/db.php?fn=getCountArticles&idUser=${sessionStorage.prices_id}`)
+        //console.log(res) // {success: true, exception: '', result: 1}
+        if (res.success) {
+            if (res.result < 10)
+                isContinue = true
+            else
+                alert('Usuario de pruebas solo 10 articulos maximo')
+        }
+    }
+    else
+        isContinue = true;
+    if (isContinue) {
+        formTitle.innerText = 'Agregar artículo'
+        form.id.value = '0' // 0=agregar
+        loadSelectFamilies()
+        modal.style.display = 'flex'
+        form.code.focus()
+    }
 }
 
-async function editArticle(id, copy=false) {
+async function editArticle(id, copy = false) {
     // solicitud de datos del articulo
-    const response = await executeGet('src/php/db.php?fn=getArticle&id=' + id)
+    const response = await executeGet(`src/php/db.php?fn=getArticle&idUser=${sessionStorage.prices_id}&id=${id}`)
     //console.log(response) // success:false|true, exception:<string>|null, result:null|false|{object}
     if (response.success && response.result) {
         formTitle.innerText = copy ? 'Agregar artículo' : 'Modificar artículo'
@@ -46,9 +64,9 @@ function delArticle(id, description) {
 
 // security by post
 async function loadUsersSelect() {
-    
+
     // solo si es super-admin pedir lista de usuarios id-username
-    if (sessionStorage.prices_id === '1') {   
+    if (sessionStorage.prices_id === '1') {
         let formData = new FormData()
         formData.append('fn', 'getUsersMinimal')
         const response = await executePost('src/php/db.php', formData)
@@ -57,21 +75,21 @@ async function loadUsersSelect() {
         selUsers.innerHTML = '' // limpiar combo
         response.result.forEach(user => {
             //console.log(user)
-            selUsers.innerHTML +=  `<option value="${user.id}">${user.username}</option>`        
+            selUsers.innerHTML += `<option value="${user.id}">${user.username}</option>`
         })
-        
+
         // select super-admin    
         for (const option of selUsers.options) {
             if (option.value == '1') {
                 selUsers.selectedIndex = option.index
                 break;
             }
-        }        
+        }
     }
     // solo el usuario loggeado
     else {
         selUsers.innerHTML = `<option value="${sessionStorage.prices_id}">${sessionStorage.prices_username}</option>`
-        selUsers.style.visibility = 'hidden'    
+        selUsers.style.visibility = 'hidden'
     }
 }
 
@@ -88,7 +106,7 @@ async function loadArticles() {
         searchText = ''
     const response = await executeGet('src/php/db.php?fn=getArticles&idUser=' + idUserSelected + '&txt=' + searchText) // script.js
     //console.log(response) // success: false|true, exception: <string>|null, result: null|[]|[{},{},...]
-    
+
     tbody.innerHTML = ''
     if (response.success) {
         response.result.forEach(article => {
@@ -112,7 +130,7 @@ async function loadArticles() {
             countArticles.innerHTML += 's'
         countArticles.innerHTML += ' encontrado'
         if (response.result.length !== 1)
-            countArticles.innerHTML += 's' 
+            countArticles.innerHTML += 's'
         countArticles.innerHTML += ' con "<b>' + searchArticle.value.trim() + '</b>"'
     }
     searchArticle.value = ''
@@ -144,7 +162,7 @@ function delFamily(event) {
     //console.log('delFamily')
     idFamilyDel.value = form.idFamily.options[form.idFamily.selectedIndex].value // id a eliminar
     descriptionFamilyDel.innerText = form.idFamily.options[form.idFamily.selectedIndex].innerText
-    modalFamilyDel.style.display = 'flex'   
+    modalFamilyDel.style.display = 'flex'
 }
 
 function closeModalFamilies() {
@@ -160,14 +178,14 @@ async function loadSelectFamilies() {
     const response = await executeGet('src/php/db.php?fn=getFamilies&idUser=' + idUserSelected)
     //console.log(response) // {success: false|true, exception: <string>|null, result: null|[]|[{},{}]}
     if (response.success) {
-        const visibility =  response.result.length > 0 ? 'visible' : 'hidden'
+        const visibility = response.result.length > 0 ? 'visible' : 'hidden'
         btEditFamily.style.visibility = visibility
         btDelFamily.style.visibility = visibility
         form.idFamily.innerHTML = ''
         response.result.forEach(family => {
             form.idFamily.innerHTML += `<option value="${family.id}">${family.description}</option>`
         })
-    }    
+    }
 }
 
 btCancel.onclick = () => {
@@ -179,6 +197,7 @@ btOkDel.onclick = async () => {
     divDelArticle.style.display = 'none'
     formData = new FormData
     formData.append('fn', 'delArticle')
+    formData.append('idUser', sessionStorage.prices_id)
     formData.append('id', idToDel.value)
     const response = await executePost('src/php/db.php', formData) // script.js
     //console.log(response) // success:false|true, exception:<string>|null, result:null|true
@@ -188,11 +207,11 @@ btOkDel.onclick = async () => {
         setTimeout(() => {
             modalDel.click() // se genera el param 'eve'
             divDelArticle.style.display = 'block'
-            searchArticle.value = searchText == '' ? '.' : searchText 
+            searchArticle.value = searchText == '' ? '.' : searchText
             loadArticles()
         }, 2000)
     }
-    else 
+    else
         showStatusDel() // form.js 
 }
 
@@ -207,6 +226,7 @@ btOkFamilyDel.onclick = async () => {
     divDelFamily.style.display = 'none'
     formData = new FormData()
     formData.append('fn', 'delFamily')
+    formData.append('idUser', sessionStorage.prices_id)
     formData.append('id', idFamilyDel.value)
     const response = await executePost('src/php/db.php', formData) // script.js
     //console.log(response) // # success:false|true, exception:<string>|null, result:null|true
@@ -216,10 +236,10 @@ btOkFamilyDel.onclick = async () => {
         setTimeout(() => {
             // cerrar modal
             modalFamilyDel.click() // se genera el param 'eve'
-            divDelFamily.style.display = 'block'            
+            divDelFamily.style.display = 'block'
         }, 2000)
     }
-    else 
+    else
         showStatusFamilyDel() // form.js 
 }
 
@@ -281,7 +301,7 @@ modalAddEditFamily.onclick = (eve) => {
 formFamily.onsubmit = async (eve) => {
     eve.preventDefault()
     //console.log('submit')
-    
+
     // verificar si ya existe la family
     const description = formFamily.description.value.trim()
     const response = await executeGet('src/php/db.php?fn=isFamilyExists&idUser=' + idUserSelected + '&description=' + description + '&id=' + formFamily.id.value)
@@ -297,7 +317,7 @@ formFamily.onsubmit = async (eve) => {
             const response = await executePost('src/php/db.php', formData)
             //console.log(response) // {success:false|true, exception:<string>|null, result:null|true}
             if (response.success && response.result) {
-                const txt = formFamily.id.value == '0' 
+                const txt = formFamily.id.value == '0'
                     ? 'La nueva familia ha sido agregada.'
                     : 'La familia ha sido modificada.'
                 showStatusFamily(txt, false) // form.js
@@ -309,7 +329,7 @@ formFamily.onsubmit = async (eve) => {
                     //console.log('id antes de modificar: ', idCurrent)
                 }
                 await loadSelectFamilies() // recargar familias en el combo
-                
+
                 // si recien agregada, seleccionar la de value mayor
                 if (formFamily.id.value == '0') {
                     let idMax = 0
@@ -319,7 +339,7 @@ formFamily.onsubmit = async (eve) => {
                         if (idMax < parseInt(option.value)) {
                             idMax = parseInt(option.value)
                             index = option.index
-                        }    
+                        }
                     }
                     //console.log(index)
                     form.idFamily.selectedIndex = index
@@ -331,11 +351,11 @@ formFamily.onsubmit = async (eve) => {
                         if (option.value == idCurrent) {
                             //console.log('option.value=', option.value)
                             form.idFamily.selectedIndex = option.index
-                            break; 
-                        }    
+                            break;
+                        }
                     }
                 }
-                
+
                 setTimeout(() => {
                     modalAddEditFamily.click() // cerrar form addEdit family
                     formFamily.style.display = 'block'
@@ -356,7 +376,7 @@ formFamily.onsubmit = async (eve) => {
 // form add-edit article
 form.onsubmit = async (eve) => {
     eve.preventDefault()
-    
+
     // verificar si que no existe codigo
     let isContinue = false
     let value = form.code.value.trim()
@@ -377,7 +397,7 @@ form.onsubmit = async (eve) => {
     }
     else
         isContinue = true
-    
+
     // codigo vacio o no existe, description es obligatorio
     if (isContinue) {
         isContinue = false
@@ -390,11 +410,11 @@ form.onsubmit = async (eve) => {
             if (response.result)
                 showStatus('La descripción ya existe.') // form.js
             else
-                isContinue = true  
+                isContinue = true
         }
         // error
         else
-            showStatus()      
+            showStatus()
     }
 
     // descripcion no existe o es del mismo articulo a modificar
@@ -406,9 +426,9 @@ form.onsubmit = async (eve) => {
         response = await executePost('src/php/db.php', formData) // script.js
         //console.log('antes de guardar:', response) // success:false|true, exception:<string>|null, result:null|true
         if (response.success && response.result) {
-            const statusTxt = form.id.value == '0' 
+            const statusTxt = form.id.value == '0'
                 ? 'El nuevo artículo se ha agregado.'
-                : 'El artículo ha sido modificado.' 
+                : 'El artículo ha sido modificado.'
             showStatus(statusTxt, false)
             setTimeout(() => {
                 btCancel.click()
@@ -416,12 +436,12 @@ form.onsubmit = async (eve) => {
                 // load articles
                 searchArticle.value = searchText == '' ? '.' : searchText
                 loadArticles()
-            }, 2000)                   
+            }, 2000)
         }
     }
 }
 
-window.onload = async () => {    
+window.onload = async () => {
     if (!sessionStorage.prices_id) {
         window.location.href = 'input.html'
     }
@@ -431,9 +451,9 @@ window.onload = async () => {
         btDashboardFoot.classList.add('active')
         username.innerText = 'Usuario: ' + sessionStorage.prices_username
         searchArticle.focus()
-        await loadUsersSelect() 
-        idUserSelected = selUsers.options[selUsers.selectedIndex].value     
+        await loadUsersSelect()
+        idUserSelected = selUsers.options[selUsers.selectedIndex].value
         // searchArticle.value = '*'
         // loadArticles()                
-    }    
-} 
+    }
+}

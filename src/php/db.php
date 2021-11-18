@@ -19,7 +19,7 @@ if (!empty($_GET) and isset($_GET['fn'])) {
             isDescriptionExists($_GET['idUser'], $_GET['description'], $_GET['id']);
             break;
         case 'getArticle':
-            getArticle($_GET['id']);
+            getArticle($_GET['idUser'], $_GET['id']);
             break;
         case 'getFamilies':
             getFamilies($_GET['idUser']);
@@ -42,6 +42,9 @@ if (!empty($_GET) and isset($_GET['fn'])) {
         case 'isEmailTokenExists':
             isEmailTokenExists($_GET['email'], $_GET['token']);
             break;
+        case 'getCountArticles':
+            getCountArticles($_GET['idUser']);
+        break;
     }
     exit();
 }
@@ -54,13 +57,13 @@ else if (!empty($_POST) and isset($_POST['fn'])) {
             addUpdateArticle(); # en la funcion tomar $_POST
             break;
         case 'delArticle':
-            delArticle($_POST['id']);
+            delArticle($_POST['idUser'], $_POST['id']);
             break;
         case 'addUpdateFamily':
             addUpdateFamily($_POST['idUser'], $_POST['id'], $_POST['description']);
             break;
         case 'delFamily':
-            delFamily($_POST['id']);
+            delFamily($_POST['idUser'], $_POST['id']);
             break;
         case 'getUsersMinimal':
             getUsersMinimal();
@@ -93,13 +96,13 @@ else if (!empty(file_get_contents('php://input'))) {
             // fn, description, price, cost, code, idFamily, idUser, id
             break;
         case 'delArticle':
-            delArticle($post->id);
+            delArticle($post->idUser, $post->id);
             break;
         case 'addUpdateFamily':
             addUpdateFamily($post->idUser, $post->id, $post->description);
             break;
         case 'delFamily':
-            delFamily($post->id);
+            delFamily($post->idUser, $post->id);
             break;
         case 'getUsersMinimal':
             getUsersMinimal();
@@ -150,8 +153,7 @@ class Database {
             $sta->execute($params);
             $result = $all ? $sta->fetchAll() : $sta->fetch();
             $response['success'] = true;
-            if ($result)
-              $response['result'] = $result;
+            $response['result'] = $result;
         }
         catch (Exception $e) {
             $response['exception'] = $e->getMessage();
@@ -217,10 +219,50 @@ function addUpdateUserData() {
         $_POST['pass'] = password_hash($_POST['pass'], PASSWORD_BCRYPT); # encriptar pass
 
     # add?
-    if (intval($_POST['id']) == 0) {
+    if (intval($_POST['id']) == -1) {
         $sql = 'INSERT INTO users (username, email, pass) VALUES (?, ?, ?)';
         $params = array($_POST['username'], $_POST['email'], $_POST['pass']);
-        $response = Database::executeSql($sql, $params, false); 
+        Database::executeSql($sql, $params, false); 
+        
+        // get new id 
+        $sql = 'SELECT MAX(id) id FROM users';
+        $response = Database::executeSql($sql, null, false); // {'success'=>false|true, 'exception'=>'', 'result'=>null|[{'id':<int>}]};
+        $_POST['id'] = $response['result']['id'];
+
+        /// create new table families_<id>
+        $sql = 'CREATE TABLE families_'.$_POST['id'].' (
+            id          INTEGER PRIMARY KEY AUTOINCREMENT,
+            description TEXT    COLLATE NOCASE            
+        )';
+        Database::executeSql($sql);
+        
+        /// create new table articles_<id>
+        $sql = 'CREATE TABLE articles_'.$_POST['id'].' (
+            id          INTEGER PRIMARY KEY AUTOINCREMENT,
+            code        TEXT,
+            description TEXT    COLLATE NOCASE,
+            price       REAL,
+            cost        REAL,
+            id_family   INTEGER REFERENCES families_'.$response['result']['id'].' (id) 
+                                                         ON DELETE SET NULL
+                                                         ON UPDATE CASCADE           
+        )';
+        Database::executeSql($sql);
+
+        /// create view v_articles_<id>
+        $sql = 'CREATE VIEW v_articles_'.$_POST['id'].' AS
+            SELECT a.id,
+                a.description,
+                a.price,
+                a.cost,
+                a.code,
+                COALESCE(f.description, "") family
+            FROM articles_'.$_POST['id'].' a
+                LEFT JOIN
+                families_'.$_POST['id'].' f ON f.id = a.id_family
+            ORDER BY a.description';
+        Database::executeSql($sql);    
+
         $response['result'] = true;
     }
     # update
@@ -257,15 +299,25 @@ function getUsersData() {
     exit(json_encode($response));
 }
 
-function isUsernameExists($username, $id) {
+function isUsernameExists($username, $id) {    
     $sql = 'SELECT 1 FROM users WHERE username = ? AND id <> ?';
     $params = array($username, $id);
     $response = Database::executeSql($sql, $params);
     $response['result'] = count($response['result']) > 0;
-    exit(json_encode($response));
+    exit(json_encode($response));    
 }
 
 function delUser($id) {
+    /// first delete view and tables of user
+    $sql = 'DROP VIEW v_articles_'.$id;
+    Database::executeSql($sql, null, false);
+
+    $sql = 'DROP TABLE families_'.$id;
+    Database::executeSql($sql, null, false);
+
+    $sql = 'DROP TABLE articles_'.$id;
+    Database::executeSql($sql, null, false);
+
     $sql = 'DELETE FROM users WHERE id = ?';
     $params = array($id);
     $response = Database::executeSql($sql, $params, false); # success:false|true, exception:<string>|null, result:false
@@ -320,15 +372,14 @@ function getUsersMinimal() {
 ##### families (all request of dashboard.js)
 
 function getFamilies($idUser) {
-    $sql = 'SELECT id, description FROM families WHERE id_user = ? ORDER BY description';
-    $params = array($idUser);
-    $response = Database::executeSql($sql, $params);
+    $sql = 'SELECT id, description FROM families_'.$idUser.' ORDER BY description';    
+    $response = Database::executeSql($sql);
     exit(json_encode($response));
 }
 
 function isFamilyExists($idUser, $description, $id) {
-    $sql = 'SELECT 1 FROM families WHERE id_user = ? AND description = ? AND id <> ?';
-    $params = array($idUser, $description, $id);
+    $sql = 'SELECT 1 FROM families_'.$idUser.' WHERE description = ? AND id <> ?';
+    $params = array($description, $id);
     $response = Database::executeSql($sql, $params, false); # success:false|true, exception:<string>|null, result:null|false|{1:'1'}
     if ($response['success'] and $response['result']) # si result no es false y contiene datos
       $response['result'] = true;
@@ -338,15 +389,15 @@ function isFamilyExists($idUser, $description, $id) {
 function addUpdateFamily($idUser, $id, $description) {
     # add
     if ($id == '0') {
-        $sql = 'INSERT INTO families(description, id_user) VALUES(?, ?)';
-        $params = array($description, $idUser);
+        $sql = 'INSERT INTO families_'.$idUser.' (description) VALUES(?)';
+        $params = array($description);
         $response = Database::executeSql($sql, $params); # success:false|true, exception:<string>|null, result:null|false
         if ($response['success'])
             $response['result'] = true;
     }
     # edit
     else {
-        $sql = 'UPDATE families SET description = ? WHERE id = ?';
+        $sql = 'UPDATE families_'.$idUser.' SET description = ? WHERE id = ?';
         $params = array($description, $id);
         $response = Database::executeSql($sql, $params); # success:false|true, exception:<string>|null, result:null|false
         if ($response['success'])
@@ -355,8 +406,8 @@ function addUpdateFamily($idUser, $id, $description) {
     exit(json_encode($response));
 }
 
-function delFamily($id) {
-    $sql = 'DELETE FROM families WHERE id = ?';
+function delFamily($idUser, $id) {
+    $sql = 'DELETE FROM families_'.$idUser.' WHERE id = ?';
     $params = array($id);
     $response = Database::executeSql($sql, $params); # success:false|true, exception:<string>|null, result:null|false (false=sin datos, pero si exitoso)
     if ($response['success'])
@@ -369,13 +420,13 @@ function delFamily($id) {
 function getArticles($idUser, $txt) {
     # consulta a vista indexada
     $sql = 'SELECT id, description, price, cost, code, family 
-            FROM v_articles 
-            WHERE id_user = ?';
-    $params = array($idUser);
+            FROM v_articles_'.$idUser;
+    
+    $params = array();
         
     # busqueda por texto
     if (strlen($txt) > 0) {
-        $sql .= ' AND (REPLACE(description, "ñ", "Ñ") LIKE ? OR code LIKE ? OR family LIKE ?)';
+        $sql .= ' WHERE (REPLACE(description, "ñ", "Ñ") LIKE ? OR code LIKE ? OR family LIKE ?)';
         # quitar acentos
         $txt = utf8_encode(strtr(utf8_decode($txt), utf8_decode('áéíóúÁÉÍÓÚñ'), utf8_decode('aeiouAEIOUÑ')));
         
@@ -395,15 +446,15 @@ function getArticles($idUser, $txt) {
 }
 
 function isCodeExists($idUser, $code, $id) {
-    $sql = 'SELECT description FROM articles WHERE id_user = ? AND code = ? AND id <> ?';
-    $params = array($idUser, $code, $id);
+    $sql = 'SELECT description FROM articles_'.$idUser.' WHERE code = ? AND id <> ?';
+    $params = array($code, $id);
     $response = Database::executeSql($sql, $params, false); # success:false|true, exception:<string>|null, result:null|false|{description:<description>} 
     exit(json_encode($response));
 }
 
 function isDescriptionExists($idUser, $description, $id) {
-    $sql = 'SELECT 1 FROM articles WHERE id_user = ? AND description = ? AND id <> ?';
-    $params = array($idUser, $description, $id);
+    $sql = 'SELECT 1 FROM articles_'.$idUser.' WHERE description = ? AND id <> ?';
+    $params = array($description, $id);
     $response = Database::executeSql($sql, $params, false); # success:false|true, exception:<string>|null, result:null|false|{1:'1'} 
     if ($response['success'] and $response['result']) # result false=no_existe, {1:'1'}=existe
         $response['result'] = true;
@@ -419,15 +470,15 @@ function addUpdateArticle() {
         $_POST['cost'] = null;
     # add
     if ($_POST['id'] == '0') {
-        $sql = 'INSERT INTO articles (description, price, cost, code, id_family, id_user) VALUES (?, ?, ?, ?, ?, ?)';
-        $params = array($_POST['description'], $_POST['price'], $_POST['cost'], $_POST['code'], $_POST['idFamily'], $_POST['idUser']);
+        $sql = 'INSERT INTO articles_'.$_POST['idUser'].' (description, price, cost, code, id_family) VALUES (?, ?, ?, ?, ?)';
+        $params = array($_POST['description'], $_POST['price'], $_POST['cost'], $_POST['code'], $_POST['idFamily']);
         $response = Database::executeSql($sql, $params, false); # success:false|true, exception:<string>|null, result:null|false (false=sin datos, pero si exitoso) 
         if ($response['success'])
             $response['result'] = true; # sustituir false(sin datos) x true(realizado)
     }
     # edit
     else {
-        $sql = 'UPDATE articles SET description = ?, price = ?, cost = ?, code = ?, id_family = ? WHERE id = ?';
+        $sql = 'UPDATE articles_'.$_POST['idUser'].' SET description = ?, price = ?, cost = ?, code = ?, id_family = ? WHERE id = ?';
         $params = array($_POST['description'], $_POST['price'], $_POST['cost'], $_POST['code'], $_POST['idFamily'], $_POST['id']);
         $response = Database::executeSql($sql, $params, false); # success:false|true, exception:<string>|null, result:null|false (false=sin datos, pero si exitoso) 
         if ($response['success'])
@@ -445,15 +496,15 @@ function addUpdateArticleJson($post) {
         $post->cost = null;
     # add
     if ($post->id == '0') {
-        $sql = 'INSERT INTO articles (description, price, cost, code, id_family, id_user) VALUES (?, ?, ?, ?, ?, ?)';
-        $params = array($post->description, $post->price, $post->cost, $post->code, $post->idFamily, $post->idUser);
+        $sql = 'INSERT INTO articles_'.$post->idUser.' (description, price, cost, code, id_family) VALUES (?, ?, ?, ?, ?)';
+        $params = array($post->description, $post->price, $post->cost, $post->code, $post->idFamily);
         $response = Database::executeSql($sql, $params, false); # success:false|true, exception:<string>|null, result:null|false (false=sin datos, pero si exitoso) 
         if ($response['success'])
             $response['result'] = true; # sustituir false(sin datos) x true(realizado)
     }
     # edit
     else {
-        $sql = 'UPDATE articles SET description = ?, price = ?, cost = ?, code = ?, id_family = ? WHERE id = ?';
+        $sql = 'UPDATE articles_'.$post->idUser.' SET description = ?, price = ?, cost = ?, code = ?, id_family = ? WHERE id = ?';
         $params = array($post->description, $post->price, $post->cost, $post->code, $post->idFamily, $post->id);
         $response = Database::executeSql($sql, $params, false); # success:false|true, exception:<string>|null, result:null|false (false=sin datos, pero si exitoso) 
         if ($response['success'])
@@ -462,21 +513,28 @@ function addUpdateArticleJson($post) {
     exit(json_encode($response));    
 }
 
-function getArticle($id) {
+function getArticle($idUser, $id) {
     $sql = 'SELECT a.code, a.description, a.price, a.cost, a.description, a.id_family 
-            FROM articles a 
+            FROM articles_'.$idUser.' a 
             WHERE a.id = ?';
     $params = array($id);
     $response = Database::executeSql($sql, $params, false); # success:false|true, exception:<string>|null, result:null|false|{object}
     exit(json_encode($response));
 }
 
-function delArticle($id) {
-    $sql = 'DELETE FROM articles WHERE id = ?';
+function delArticle($idUser, $id) {
+    $sql = 'DELETE FROM articles_'.$idUser.' WHERE id = ?';
     $params = array($id);
     $response = Database::executeSql($sql, $params); # success:false|true, exception:<string>|null, result:null|false(sin datos pero exitoso)
     if ($response['success'] and $response['result'])
         $response['result'] = true; # false(sin datos) a true(exitoso)
+    exit(json_encode($response));
+}
+
+function getCountArticles($idUser) {
+    $sql = 'SELECT COUNT(id) count FROM articles_'.$idUser;
+    $response = Database::executeSql($sql, null, false); // {success:false|true, exception:<string>|null, result:null|{'count':<int>}}  
+    $response['result'] = intval($response['result']['count']);
     exit(json_encode($response));
 }
 

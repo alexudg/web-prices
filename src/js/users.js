@@ -1,12 +1,12 @@
-function addEditUser(id, username=null, email=null) {
+function addEditUser(id, username = null, email = null) {
     //console.log(id)
-    formTitle.innerText = id == 0 ? 'Agregar usuario' : 'Modificar usuario'
+    formTitle.innerText = id == -1 ? 'Agregar usuario' : 'Modificar usuario'
     form.id.value = id
-    if (id != 0) {
+    if (id != -1) {
         form.username.value = username
-        form.email.value = email        
+        form.email.value = email
         ckPass.style.display = 'inline'
-        lbPass.style.display = 'inline'        
+        lbPass.style.display = 'inline'
     }
     // add, pass obligatorio
     else {
@@ -76,7 +76,7 @@ async function okDel() {
             divDel.style.display = 'block'
         }
     }
-    else 
+    else
         showStatusDel('El usuario no puede ser elimnado porque es el <b>super-admin</b>')
 }
 
@@ -106,7 +106,7 @@ function ckPassChange(isChecked) {
 form.onsubmit = async (eve) => {
     eve.preventDefault()
     //console.log('submit')
-    
+
     // username existe?
     const response = await executeGet(URL_SERVER + '?fn=isUsernameExists&username=' + form.username.value + '&id=' + form.id.value)
     //console.log(response) // success: false|true, except:<string>|null, result:null|false|true
@@ -114,15 +114,15 @@ form.onsubmit = async (eve) => {
     if (response.success) {
         if (response.result) {
             showStatus('El nombre de usuario ya existe.') // form.js
-            form.username.focus() 
+            form.username.focus()
         }
         else
             isContinue = true
     }
     else
         showStatus() // form.js
-    
-    // email existe?
+
+    // email exists?
     if (isContinue) {
         isContinue = false
         const response = await executeGet(URL_SERVER + '?fn=isEmailExists&email=' + form.email.value + '&id=' + form.id.value)
@@ -138,7 +138,7 @@ form.onsubmit = async (eve) => {
         else
             showStatus() // form.js
     }
-    
+
     // password
     if (isContinue) {
         isContinue = false
@@ -166,8 +166,9 @@ form.onsubmit = async (eve) => {
         formData.append('pass', form.pass.value) // ''=no cambiar, sino cambiarla
         const response = await executePost(URL_SERVER, formData)
         //console.log(response) // success:false|true, exception:<string>|null, result:null|false|true
-        if (response.success && response.result) {            
-            const txt = form.id.value == '0' 
+        
+        if (response.success && response.result) {
+            const txt = form.id.value == '-1'
                 ? 'El nuevo usuario ha sido agregado.'
                 : 'El usuario ha sido modificado.'
             showStatus(txt, false)
@@ -218,5 +219,5 @@ window.onload = () => {
         btUsersList.classList.add('active')
         btUsersFoot.classList.add('active')
         loadUsers()
-    }    
+    }
 }

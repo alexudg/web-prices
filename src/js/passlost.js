@@ -1,7 +1,7 @@
 //const URL_PASS_RENEW = 'http://192.168.0.27/web-prices' // PC
 //const URL_PASS_RENEW = 'http://192.168.0.7/web-prices' // laptop
 //const URL_PASS_RENEW = 'http://gucitex.com.mx/05' // gucitex
-const URL_PASS_RENEW = 'http://puntoplanet.cu.ma' // cu.ma
+const URL_PASS_RENEW = 'http://127.0.0.1/web-prices' // cu.ma
 
 function closeStatus() {
     statusArea.style.display = 'none'
@@ -11,9 +11,9 @@ form.onsubmit = async (eve) => {
     eve.preventDefault()
     //console.log('submit')
 
-    divForm.style.display = 'none'
+    divForm.style.display = 'none' // hidde form
     // verify if email exists, id=0 without owner
-    const response = await executeGet(URL_SERVER + '?fn=isEmailExists&email=' + form.email.value + '&id=0') // script.js
+    const response = await executeGet(URL_SERVER + '?fn=isEmailExists&email=' + form.email.value + '&id=0') // 0=user pruebas, not authorized
     //console.log(response) // {success: false|true, exception:<string>|null, result:null|false|true}
     if (response.success && response.result) {
         // generar un nuevo token
@@ -26,10 +26,10 @@ form.onsubmit = async (eve) => {
             const uri = URL_PASS_RENEW + '/passrenew.html?email=' + form.email.value + '&token=' + response.result 
                 Email.send({
                     Host : 'smtp.gmail.com',
-                    Username : 'puntoplanet',
-                    Password : 'Jalisco01',
+                    Username : 'planetsistemasmx',
+                    Password : 'Jalisco=01',
                     To : form.email.value,
-                    From : 'puntoplanet@gmail.com',
+                    From : 'planetsistemasmx@gmail.com',
                     Subject : 'Renovar contraseña en checador de precios',
                     Body : 'Para renovar tu contraseña da un click en el siguiente boton...<br><a href="' + uri + '"><button>Renovar contraseña</button></a>'
                 })

@@ -6,11 +6,14 @@ let html = `<a href="index.html"><img src="src/img/logo62x40.png" alt="Logotipo"
         <h3>Checador de precios</h3>
         <nav class="navMain">
             <a href="index.html" id="btIndex">Inicio</a>`
-if (!sessionStorage.prices_id)
+if (!sessionStorage.prices_id) // if not exists
     html +=`<a href="input.html" id="btInput">Ingresar</a>`
 //var id = sessionStorage.getItem('id')
-if (sessionStorage.prices_id)
-    html +=`<a href="dashboard.html" id="btDashboard">Precios</a><a href="mydata.html" id="btMyData">Mis datos</a>` // en linea porque genera espacio si se pasa al sig renglon
+if (sessionStorage.prices_id) { // if exists
+    html +='<a href="dashboard.html" id="btDashboard">Precios</a>'
+    if (sessionStorage.prices_id != '0')
+        html += '<a href="mydata.html" id="btMyData">Mis datos</a>' // en linea porque genera espacio si se pasa al sig renglon
+}    
 if (sessionStorage.prices_id == '1') // super-admin
     html +=`<a href="users.html" id="btUsers">Usuarios</a>`
 if (sessionStorage.prices_id)
@@ -20,16 +23,18 @@ html +=`</nav>
 
 document.getElementsByTagName('header')[0].innerHTML = html
 
-// menu emergente al final para quedar mas arriba en la pila o z
+// menu drawer al final para quedar mas arriba en la pila o z
 html = `<aside class="menu-aside">
 <i class="fa fa-times-circle fa-lg btn-menu-close" id="btnMenuClose"></i>
                 <ul class="menu-list">
                     <li><a href="index.html" id="btIndexList">Inicio</a></li>`
-if (!sessionStorage.prices_id)
-    html +=        `<li><a href="input.html" id="btInputList">Ingresar</a></li>`
-if (sessionStorage.prices_id)
-    html +=        `<li><a href="dashboard.html" id="btDashboardList">Precios</a></li>
-                    <li><a href="mydata.html" id="btMyDataList">Mis datos</a></li>`
+if (!sessionStorage.prices_id) // if not exists
+    html += '<li><a href="input.html" id="btInputList">Ingresar</a></li>'
+if (sessionStorage.prices_id) { // if exists
+    html += '<li><a href="dashboard.html" id="btDashboardList">Precios</a></li>'
+    if (sessionStorage.prices_id != '0') // if not is user 'pruebas'
+        '<li><a href="mydata.html" id="btMyDataList">Mis datos</a></li>'
+}                    
 if (sessionStorage.prices_id == '1') // super-admin
     html +=        `<li><a href="users.html" id="btUsersList">Usuarios</a></li>`
 if (sessionStorage.prices_id)
@@ -51,12 +56,14 @@ html = `<section>
             <div>
                 <nav>
                     <a href="index.html" id="btIndexFoot">Inicio</a>`
-if (!sessionStorage.prices_id)
-    html +=        `<a href="input.html" id="btInputFoot">Ingresar</a>`
-if (sessionStorage.prices_id)
-    html +=        `<a href="dashboard.html" id="btDashboardFoot">Precios</a>
-                    <a href="mydata.html" id="btMyDataFoot">Mis datos</a>`
-if (sessionStorage.prices_id == 1)
+if (!sessionStorage.prices_id) // if not exists
+    html += '<a href="input.html" id="btInputFoot">Ingresar</a>'
+if (sessionStorage.prices_id) { // if exists
+    html +=        '<a href="dashboard.html" id="btDashboardFoot">Precios</a>'
+    if (sessionStorage.prices_id != '0') 
+        '<a href="mydata.html" id="btMyDataFoot">Mis datos</a>'
+}                    
+if (sessionStorage.prices_id == '1')
     html +=        `<a href="users.html" id="btUsersFoot">Usuarios</a>` 
 if (sessionStorage.prices_id)
     html +=        `<a href="exit.html">Salir</a>`       
@@ -107,7 +114,8 @@ async function executePost(url, data, isText=false) {
         return isText ? response.text() : response.json()
     })
     .then(data => {
-        //console.log(data)
+        if (isText)
+            console.log(data)
         echo = data
     })
     .catch(error => {
