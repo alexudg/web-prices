@@ -16,13 +16,13 @@ if (sessionStorage.prices_id == '1') // super-admin
 if (sessionStorage.prices_id)
     html +=`<a href="exit.html" id="btExit">Salir</a>`            
 html +=`</nav>
-        <img class="btmenu" src="src/img/menu32px.png" onclick="menuOpen()">`           
+        <i class="fa fa-bars btn-menu" id="btnMenu"></i>`           
 
 document.getElementsByTagName('header')[0].innerHTML = html
 
 // menu emergente al final para quedar mas arriba en la pila o z
 html = `<aside class="menu-aside">
-                <img class="menu-close" src="src/img/close24px.png" onclick="menuClose()">
+<i class="fa fa-times-circle fa-lg btn-menu-close" id="btnMenuClose"></i>
                 <ul class="menu-list">
                     <li><a href="index.html" id="btIndexList">Inicio</a></li>`
 if (!sessionStorage.prices_id)
@@ -116,13 +116,13 @@ async function executePost(url, data, isText=false) {
     return echo
 }
 
-function menuClose() {
+btnMenuClose.onclick = () => {
     //console.log(menuHidden)
     menuHidden.style.display = 'none'
     menuHidden.firstChild.style.marginRight = '-160px'
 }
 
-function menuOpen() {
+btnMenu.onclick = () => {
     //console.log(menuHidden.firstChild) // menu-aside
     menuHidden.style.display = 'block'
     setTimeout(() => menuHidden.firstChild.style.marginRight = '0px', 1)    
