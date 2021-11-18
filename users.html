@@ -1,14 +1,15 @@
 <!DOCTYPE html>
-<html lang="es-ES">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="shortcut icon" href="src/img/favicon32px.png" type="image/png">
-    <link rel="stylesheet" href="src/css/style.css">
+    <link rel="shortcut icon" href="src/img/favicon32.png" type="image/png">
+    <title>Checador de precios</title>
+    <link rel="stylesheet" href="src/css/main.css">
     <link rel="stylesheet" href="src/css/table.css">
     <link rel="stylesheet" href="src/css/modal.css"> <!-- contiene form.css -->
-    <title>Checador de precios</title>
+    <link rel="stylesheet" href="src/icon/css/all.css"> <!-- Font Awesome -->
 </head>
 <body>  
     <header></header>  
@@ -17,14 +18,14 @@
         <table>            
             <caption>                
                 <span>Usuarios</span>                 
-                <button onclick="addEditUser(0)"><img src="src/img/add24px.png"></button> 
+                <button onclick="addEditUser(0)"><i class="fa fa-plus-circle"></i>Agregar</button> 
             </caption>
             <thead>                
                 <tr>
-                    <th>ID</th>
+                    <th>id</th>
                     <th>username</th>
                     <th>email</th>
-                    <th>Acciones</th>
+                    <th>acctions</th>
                 </tr>
             </thead>
             <tbody id="tbody">
@@ -45,15 +46,14 @@
             <div id="divAddEdit">
                 <form class="form__form" id="form">
                     <input type="hidden" name="id"> <!-- 0=insert, >0 update -->
-                    <input type="text" name="username" placeholder="*Usuario" required>
-                    <input type="email" name="email" placeholder="*Correo" required>
+                    <input type="text" name="username" placeholder="Usuario" required>
+                    <input type="email" name="email" placeholder="Correo" required>
                     <input type="checkbox" name="ckPass" id="ckPass" onchange="ckPassChange(this.checked)">
                     <label for="ckPass" id="lbPass">Cambiar contraseña</label>
                     <section id="sectionPass" class="form__section-pass">
-                        <input type="password" name="pass" placeholder="*Contraseña">
-                        <input type="password" name="confirm" placeholder="*Confirmar contraseña">
-                    </section>
-                    <h5>*Campos obligatorios</h5>
+                        <input type="password" name="pass" placeholder="Contraseña">
+                        <input type="password" name="confirm" placeholder="Confirmar contraseña">
+                    </section>                    
                     <div class="form__buttons">
                         <input type="submit" value="Guardar">
                         <input type="button" value="Cancelar" onclick="cancelAddEdit()">
@@ -89,7 +89,7 @@
     
     <footer></footer>
     <section class="menu-hidden" id="menuHidden"></section>
-    <script src="src/js/script.js"></script>
+    <script src="src/js/main.js"></script>
     <script src="src/js/form.js"></script>
     <script src="src/js/users.js"></script>
 </body>

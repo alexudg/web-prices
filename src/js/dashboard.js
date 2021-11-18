@@ -101,9 +101,9 @@ async function loadArticles() {
                                     <td>${article.code}</td>
                                     <td>${article.family}</td>
                                     <td>
-                                        <button class="bt-edit" onclick="editArticle(${article.id})"><img src="src/img/edit24px.png" alt="Editar" title="Editar"></button>
-                                        <button class="bt-edit" onclick="editArticle(${article.id}, true)"><img src="src/img/copy24px.png" alt="Clonar" title="Clonar"></button>
-                                        <button class="bt-del" onclick="delArticle(${article.id}, '${article.description}')"><img src="src/img/trash24px.png" alt="Eliminar" title="Eliminar"></button>
+                                        <button class="bt-edit" onclick="editArticle(${article.id})"><i class="fa fa-edit fa-lg"></i></button>
+                                        <button class="bt-copy" onclick="editArticle(${article.id}, true)"><i class="fa fa-copy fa-lg"></i></button>
+                                        <button class="bt-del" onclick="delArticle(${article.id}, '${article.description}')"><i class="fa fa-trash fa-lg"></i></button>
                                     </td>
                                 </tr>`
         });
@@ -117,9 +117,8 @@ async function loadArticles() {
     }
     searchArticle.value = ''
     // si el body es mayor al port-view vertical, mostrar flecha arriba
-    arrowUp.style.display = document.body.clientHeight > window.innerHeight ? 'inherit' : 'none'
+    arrowUp.style.display = document.body.clientHeight > window.innerHeight ? 'block' : 'none'
 }
-
 function addFamily(event) {
     event.preventDefault()
     //console.log('addFamily')    

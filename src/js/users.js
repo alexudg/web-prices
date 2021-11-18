@@ -196,8 +196,8 @@ async function loadUsers() {
                                     <td>${users.username}</td>
                                     <td>${users.email}</td>
                                     <td>
-                                        <button class="bt-edit" onclick="addEditUser(${users.id}, '${users.username}', '${users.email}')"><img src="src/img/edit24px.png" alt="Editar" title="Editar"></button>
-                                        <button class="bt-del" onclick="delUser(${users.id}, '${users.username}')"><img src="src/img/trash24px.png" alt="Eliminar" title="Eliminar"></button>
+                                        <button class="bt-edit" onclick="addEditUser(${users.id}, '${users.username}', '${users.email}')"><i class="fa fa-edit fa-lg"></i></button>
+                                        <button class="bt-del" onclick="delUser(${users.id}, '${users.username}')"><i class="fa fa-trash fa-lg"></i></button>
                                     </td>
                                 </tr>`
         });

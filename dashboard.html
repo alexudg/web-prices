@@ -1,27 +1,28 @@
 <!DOCTYPE html>
-<html lang="es-ES">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="src/css/style.css">
+    <link rel="shortcut icon" href="src/img/favicon32.png" type="image/png">
+    <title>Checador de precios</title>
+    <link rel="stylesheet" href="src/css/main.css">
     <link rel="stylesheet" href="src/css/modal.css">
     <link rel="stylesheet" href="src/css/table.css">
-    <link rel="shortcut icon" href="src/img/favicon32px.png" type="image/png">
-    <title>Checador de precios</title>
+    <link rel="stylesheet" href="src/icon/css/all.css"> <!-- Font Awesome -->
 </head>
 <body>
     <header></header>
     <main>
         <table>            
             <caption>
-                <h6>Para encontrar todo "."</h6>
+                <h6>Encontrar todo "."</h6>
                 <input type="search" id="searchArticle" placeholder="buscar..." onchange="loadArticles()">
                 <span>Artículos</span>
                 <select name="iduser" id="selUsers" onchange="selUsersChange()">
                     <!-- usuarios existentes -->
                 </select>
-                <button onclick="addArticle()"><img src="src/img/add24px.png" alt="Agregar artículo" title="Agregar artículo">Agregar</button> 
+                <button onclick="addArticle()"><i class="fas fa-plus-circle"></i>Agregar</button> 
             </caption>
             <thead>                
                 <tr>
@@ -43,7 +44,7 @@
                 </tr>
             </tfoot>    
         </table>
-        <a href="#" class="arrow-up" id="arrowUp"><img src="./src/img/arrow-up32px.png" alt="Ir arriba" title="Ir arriba"></a>
+        <a href="#" class="arrow-up" id="arrowUp"><i class="far fa-arrow-alt-circle-up fa-2x"></i></a>
         <section class="modal" id="modal">
             <div class="form">
                 <h4 id="formTitle">Agregar artículo</h4>
@@ -59,9 +60,9 @@
                             <!-- combo con las familias -->
                         </select>
                         <div class="form__families__buttons">
-                            <button onclick="addFamily(event)"><img src="src/img/add24px.png" alt="Agregar" title="Agregar"></button>
-                            <button onclick="editFamily(event)" id="btEditFamily"><img src="src/img/edit24px.png" alt="Modificar" title="Modificar"></button>
-                            <button onclick="delFamily(event)" id="btDelFamily"><img src="src/img/trash24px.png" alt="Eliminar" title="Eliminar"></button>
+                            <button onclick="addFamily(event)"><i class="fa fa-plus-circle fa-lg"></i></button>
+                            <button onclick="editFamily(event)" id="btEditFamily"><i class="fa fa-edit fa-lg"></i></button>
+                            <button onclick="delFamily(event)" id="btDelFamily"><i class="fa fa-trash fa-lg"></i></button>
                         </div>
                     </div>
                     <h5>*Campos obligatorios</h5>
@@ -134,7 +135,7 @@
     </main>
     <footer></footer>
     <section class="menu-hidden" id="menuHidden"></section>
-    <script src="src/js/script.js"></script>
+    <script src="src/js/main.js"></script>
     <script src="src/js/form.js"></script>
     <script src="src/js/dashboard.js"></script>
 </body>
