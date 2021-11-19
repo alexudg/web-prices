@@ -145,7 +145,6 @@ class Database {
     } 
     
     static function executeSql($sql, $params=null, $all=true) {
-        $response = array('success'=>false, 'exception'=>'', 'result'=>null);
         try {
             if (self::$db == null)
                 self::loadDatabase();
@@ -153,10 +152,12 @@ class Database {
             $sta->execute($params);
             $result = $all ? $sta->fetchAll() : $sta->fetch();
             $response['success'] = true;
-            $response['result'] = $result;
+            $response['result'] = $result;            
         }
         catch (Exception $e) {
+            $response['success'] = false;
             $response['exception'] = $e->getMessage();
+            $response['result'] = null;
         }
         return $response;
     }
@@ -210,6 +211,8 @@ function getUserData($token) {
     $sql = 'SELECT id, username, email, token FROM users WHERE token = ?';
     $params = array($token);
     $response = Database::executeSql($sql, $params, false); # success:false|true, exception:<string>|null, result:null|false|{id:<val>, username:<val>, email:<val>}
+    if (!$response['result'])
+        $response['result'] = null;
     exit(json_encode($response));
 }
 
