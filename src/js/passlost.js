@@ -1,7 +1,8 @@
 //const URL_PASS_RENEW = 'http://192.168.0.27/web-prices' // PC
 //const URL_PASS_RENEW = 'http://192.168.0.7/web-prices' // laptop
 //const URL_PASS_RENEW = 'http://gucitex.com.mx/05' // gucitex
-const URL_PASS_RENEW = 'http://127.0.0.1/web-prices' // cu.ma
+//const URL_PASS_RENEW = 'http://puntoplanet.cu.ma/prices' // .cu.ma
+const URL_PASS_RENEW = 'http://127.0.0.1/web-prices' // localhost
 
 function closeStatus() {
     statusArea.style.display = 'none'

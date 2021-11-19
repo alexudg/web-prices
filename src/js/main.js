@@ -1,5 +1,5 @@
-//console.log('localStorage.prices_token:', localStorage.prices_token)
-//console.log('sessionStorage:', sessionStorage)
+console.log('localStorage.prices_token:', localStorage.prices_token)
+console.log('sessionStorage:', sessionStorage)
 
 // header
 let html = `<a href="index.html"><img src="src/img/logo62x40.png" alt="Logotipo"></a>
@@ -23,22 +23,22 @@ html +=`</nav>
 
 document.getElementsByTagName('header')[0].innerHTML = html
 
-// menu drawer al final para quedar mas arriba en la pila o z
+///::::::::::::  menu drawer al final para quedar mas arriba en la pila o z ::::::::///
 html = `<aside class="menu-aside">
-<i class="fa fa-times-circle fa-lg btn-menu-close" id="btnMenuClose"></i>
-                <ul class="menu-list">
-                    <li><a href="index.html" id="btIndexList">Inicio</a></li>`
+            <i class="fa fa-times-circle fa-lg btn-menu-close" id="btnMenuClose"></i>
+            <ul class="menu-list">
+                <li><a href="index.html" id="btIndexList">Inicio</a></li>`
 if (!sessionStorage.prices_id) // if not exists
     html += '<li><a href="input.html" id="btInputList">Ingresar</a></li>'
 if (sessionStorage.prices_id) { // if exists
     html += '<li><a href="dashboard.html" id="btDashboardList">Precios</a></li>'
     if (sessionStorage.prices_id != '0') // if not is user 'pruebas'
-        '<li><a href="mydata.html" id="btMyDataList">Mis datos</a></li>'
+        html += '<li><a href="mydata.html" id="btMyDataList">Mis datos</a></li>'
 }                    
 if (sessionStorage.prices_id == '1') // super-admin
-    html +=        `<li><a href="users.html" id="btUsersList">Usuarios</a></li>`
+    html +=        '<li><a href="users.html" id="btUsersList">Usuarios</a></li>'
 if (sessionStorage.prices_id)
-    html +=        `<li><a href="exit.html" id="btExitList">Salir</a></li>`
+    html +=        '<li><a href="exit.html" id="btExitList">Salir</a></li>'
     html +=    `</ul>
             </aside>`
 
@@ -51,7 +51,7 @@ menuHidden.onclick = (eve) => {
     }
 }
 
-// footer
+///:::::::::::::: footer ::::::::::::::::::///
 html = `<section>
             <div>
                 <nav>
@@ -59,14 +59,14 @@ html = `<section>
 if (!sessionStorage.prices_id) // if not exists
     html += '<a href="input.html" id="btInputFoot">Ingresar</a>'
 if (sessionStorage.prices_id) { // if exists
-    html +=        '<a href="dashboard.html" id="btDashboardFoot">Precios</a>'
+    html += '<a href="dashboard.html" id="btDashboardFoot">Precios</a>'
     if (sessionStorage.prices_id != '0') 
-        '<a href="mydata.html" id="btMyDataFoot">Mis datos</a>'
+        html +='<a href="mydata.html" id="btMyDataFoot">Mis datos</a>'
 }                    
 if (sessionStorage.prices_id == '1')
-    html +=        `<a href="users.html" id="btUsersFoot">Usuarios</a>` 
+    html +=        '<a href="users.html" id="btUsersFoot">Usuarios</a>' 
 if (sessionStorage.prices_id)
-    html +=        `<a href="exit.html">Salir</a>`       
+    html +=        '<a href="exit.html">Salir</a>'       
 html +=        `</nav>
                 <div>
                     <h4>Tel. 33-1463-1774</h4>
