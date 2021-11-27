@@ -259,6 +259,7 @@ function addUpdateUserData() {
                 a.price,
                 a.cost,
                 a.code,
+                a.id_family,
                 COALESCE(f.description, "") family
             FROM articles_'.$_POST['id'].' a
                 LEFT JOIN
@@ -381,7 +382,7 @@ function getFamilies($idUser) {
 }
 
 function isFamilyExists($idUser, $description, $id) {
-    $sql = 'SELECT 1 FROM families_'.$idUser.' WHERE description = ? AND id <> ?';
+    $sql = "SELECT 1 FROM families_$idUser WHERE description = ? AND id <> ?";
     $params = array($description, $id);
     $response = Database::executeSql($sql, $params, false); # success:false|true, exception:<string>|null, result:null|false|{1:'1'}
     if ($response['success'] and $response['result']) # si result no es false y contiene datos
@@ -392,7 +393,7 @@ function isFamilyExists($idUser, $description, $id) {
 function addUpdateFamily($idUser, $id, $description) {
     # add
     if ($id == '0') {
-        $sql = 'INSERT INTO families_'.$idUser.' (description) VALUES(?)';
+        $sql = "INSERT INTO families_$idUser (description) VALUES(?)";
         $params = array($description);
         $response = Database::executeSql($sql, $params); # success:false|true, exception:<string>|null, result:null|false
         if ($response['success'])
@@ -400,7 +401,7 @@ function addUpdateFamily($idUser, $id, $description) {
     }
     # edit
     else {
-        $sql = 'UPDATE families_'.$idUser.' SET description = ? WHERE id = ?';
+        $sql = "UPDATE families_$idUser SET description = ? WHERE id = ?";
         $params = array($description, $id);
         $response = Database::executeSql($sql, $params); # success:false|true, exception:<string>|null, result:null|false
         if ($response['success'])
@@ -410,7 +411,7 @@ function addUpdateFamily($idUser, $id, $description) {
 }
 
 function delFamily($idUser, $id) {
-    $sql = 'DELETE FROM families_'.$idUser.' WHERE id = ?';
+    $sql = "DELETE FROM families_$idUser WHERE id = ?";
     $params = array($id);
     $response = Database::executeSql($sql, $params); # success:false|true, exception:<string>|null, result:null|false (false=sin datos, pero si exitoso)
     if ($response['success'])
@@ -422,8 +423,8 @@ function delFamily($idUser, $id) {
 
 function getArticles($idUser, $txt) {
     # consulta a vista indexada
-    $sql = 'SELECT id, description, price, cost, code, family 
-            FROM v_articles_'.$idUser;
+    $sql = "SELECT id, description, price, cost, code, id_family idFamily, family 
+            FROM v_articles_$idUser";
     
     $params = array();
         
@@ -440,16 +441,18 @@ function getArticles($idUser, $txt) {
     
     # convertir price-cost str en float
     foreach ($response['result'] as $key=>$article) {
-        $response['result'][$key]['price'] += 0.0;
+        $response['result'][$key]['id'] *= 1;
+        $response['result'][$key]['price'] *= 1.0;
         # si cost no es null, convertirlo de texto a float
         if ($response['result'][$key]['cost'])
-            $response['result'][$key]['cost'] += 0.0;       
+            $response['result'][$key]['cost'] *= 1.0; 
+        $response['result'][$key]['idFamily'] *= 1;      
     }
     exit(json_encode($response));
 }
 
 function isCodeExists($idUser, $code, $id) {
-    $sql = 'SELECT description FROM articles_'.$idUser.' WHERE code = ? AND id <> ?';
+    $sql = "SELECT description FROM articles_$idUser WHERE code = ? AND id <> ?";
     $params = array($code, $id);
     $response = Database::executeSql($sql, $params, false); # success:false|true, exception:<string>|null, result:null|false|{description:<description>} 
     exit(json_encode($response));
@@ -517,11 +520,18 @@ function addUpdateArticleJson($post) {
 }
 
 function getArticle($idUser, $id) {
-    $sql = 'SELECT a.code, a.description, a.price, a.cost, a.description, a.id_family 
-            FROM articles_'.$idUser.' a 
-            WHERE a.id = ?';
+    $sql = "SELECT id, code, description, price, cost, id_family idFamily, family 
+            FROM v_articles_$idUser 
+            WHERE id = ?";
     $params = array($id);
     $response = Database::executeSql($sql, $params, false); # success:false|true, exception:<string>|null, result:null|false|{object}
+    if ($response['success']) {
+        $response['result']['id'] *= 1;
+        $response['result']['price'] *= 1.0;
+        if ($response['result']['cost'])
+            $response['result']['cost'] *= 1.0;
+        $response['result']['idFamily'] *= 1;
+    }        
     exit(json_encode($response));
 }
 
@@ -529,8 +539,7 @@ function delArticle($idUser, $id) {
     $sql = 'DELETE FROM articles_'.$idUser.' WHERE id = ?';
     $params = array($id);
     $response = Database::executeSql($sql, $params); # success:false|true, exception:<string>|null, result:null|false(sin datos pero exitoso)
-    if ($response['success'] and $response['result'])
-        $response['result'] = true; # false(sin datos) a true(exitoso)
+    $response['result'] = true; # false(sin datos) a true(exitoso)
     exit(json_encode($response));
 }
 
