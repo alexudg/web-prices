@@ -42,8 +42,9 @@ async function editArticle(id, copy = false) {
 
         // seleccionar su familia
         for (const option of form.idFamily.options) {
+            
             //console.log('option: ', option.innerText, ', family: ', response.result.family);
-            if (option.value === response.result.id_family) {
+            if (option.value == response.result.idFamily) {
                 //console.log(option.value)
                 form.idFamily.selectedIndex = option.index;
                 break;
