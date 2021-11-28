@@ -138,6 +138,7 @@ async function loadArticles() {
     // si el body es mayor al port-view vertical, mostrar flecha arriba
     arrowUp.style.display = document.body.clientHeight > window.innerHeight ? 'block' : 'none'
 }
+
 function addFamily(event) {
     event.preventDefault()
     //console.log('addFamily')    
